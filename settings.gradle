@@ -1,0 +1,2 @@
+rootProject.name = 'KiddyEnterprise'
+include ":Domain", ":Data", ":Services", ":Web"
