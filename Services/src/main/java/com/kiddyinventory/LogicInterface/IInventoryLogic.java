@@ -3,6 +3,7 @@ package com.kiddyinventory.LogicInterface;
 import com.kiddinventory.Entities.Account;
 import com.kiddinventory.Entities.Item;
 
+import java.util.List;
 import java.util.Set;
 
 public interface IInventoryLogic {
@@ -28,7 +29,7 @@ public interface IInventoryLogic {
      * @throws IllegalArgumentException if the account doesn't exist in the database
      * @throws IllegalArgumentException if the account doesn't posses any items
      */
-    Set<Item> getItemsFromAccount(int accountId);
+    List<Item> getItemsFromAccount(int accountId);
 
     /**
      * @param itemId the id of the item you want to delete
@@ -50,8 +51,9 @@ public interface IInventoryLogic {
      * @param receiverId the id of the account that wants to receive the item
      * @param item the item you want to transfer
      * @return nothing if everything goes correct
+     * @throws IllegalArgumentException if the item doesn't exists in the db
      * @throws IllegalArgumentException if one of the accounts doesn't exist in the database
-     * @throws IllegalArgumentException if the item doesn't exist
+     * @throws IllegalArgumentException if the item doesn't exist in the given sender's inventory
      */
     void moveItem(int senderId, int receiverId, Item item);
 }

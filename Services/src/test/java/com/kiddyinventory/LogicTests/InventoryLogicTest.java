@@ -11,9 +11,7 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
@@ -89,14 +87,14 @@ public class InventoryLogicTest {
         Item dummy1Item = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
         Item dummy2Item = new Item("test2item", "dit is een test item", Item.Condition.FN, 10.50f);
 
-        Set<Item> dummyItems = new HashSet<>();
+        List<Item> dummyItems = new ArrayList<>();
         dummyItems.add(dummy1Item);
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
         when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
 
-        Set<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getId());
+        List<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getId());
 
         Assert.assertEquals(dummyItems, itemsFromDb);
     }
@@ -138,7 +136,7 @@ public class InventoryLogicTest {
         Item dummy1Item = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
         Item dummy2Item = new Item("test2item", "dit is een test item", Item.Condition.FN, 10.50f);
 
-        Set<Item> dummyItems = new HashSet<>();
+        List<Item> dummyItems = new ArrayList<>();
         dummyItems.add(dummy1Item);
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
@@ -158,5 +156,46 @@ public class InventoryLogicTest {
 
         exception.expect(IllegalArgumentException.class);
         _logic.deleteItemsFromAccount(dummyAccount.getId());
+    }
+
+    @Test
+    public void TestMoveItemValid(){
+        Account dummy1Account = new Account();
+        Account dummy2Account = new Account();
+        dummy2Account.setId(1);
+        Item dummyItem = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
+        dummy1Account.setItems(new ArrayList<>(Arrays.asList(dummyItem)));
+
+        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.ofNullable(dummyItem));
+        when(accountRepository.findById(dummy1Account.getId())).thenReturn(Optional.ofNullable(dummy1Account));
+        when(accountRepository.findById(dummy2Account.getId())).thenReturn(Optional.ofNullable(dummy2Account));
+
+        _logic.moveItem(dummy1Account.getId(), dummy2Account.getId(), dummyItem);
+    }
+
+    @Test
+    public void TestMoveItemNotInDb(){
+        Account dummy1Account = new Account();
+        Account dummy2Account = new Account();
+        Item dummyItem = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
+
+        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.empty());
+
+        exception.expect(IllegalArgumentException.class);
+        _logic.moveItem(dummy1Account.getId(), dummy2Account.getId(), dummyItem);
+    }
+
+    @Test
+    public void TestMoveItemSenderDoesntContainItem(){
+        Account dummy1Account = new Account();
+        Account dummy2Account = new Account();
+        Item dummyItem = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
+
+        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.ofNullable(dummyItem));
+        when(accountRepository.findById(dummy1Account.getId())).thenReturn(Optional.ofNullable(dummy1Account));
+        when(accountRepository.findById(dummy2Account.getId())).thenReturn(Optional.ofNullable(dummy2Account));
+
+        exception.expect(IllegalArgumentException.class);
+        _logic.moveItem(dummy1Account.getId(), dummy2Account.getId(), dummyItem);
     }
 }

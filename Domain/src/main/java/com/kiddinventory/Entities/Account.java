@@ -3,7 +3,9 @@ package com.kiddinventory.Entities;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -19,7 +21,7 @@ public class Account {
             joinColumns = {@JoinColumn(name = "AccountID")},
             inverseJoinColumns = {@JoinColumn(name = "ItemID")}
     )
-    private Set<Item> items = new HashSet<>();
+    private List<Item> items = new ArrayList<>();
 
     public Account() {}
 
@@ -27,11 +29,15 @@ public class Account {
         return id;
     }
 
-    public Set<Item> getItems() {
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public List<Item> getItems() {
         return items;
     }
 
-    public void setItems(Set<Item> items) {
+    public void setItems(List<Item> items) {
         this.items = items;
     }
 }
