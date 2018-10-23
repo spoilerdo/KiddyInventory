@@ -71,16 +71,53 @@ public class InventoryLogic implements IInventoryLogic {
 
     @Override
     public void deleteItem(int itemId) {
+        //check if the items exists in the database
+        Optional<Item> itemFormDb = _inventoryContext.findById(itemId);
+        if(!itemFormDb.isPresent()){
+            throw new IllegalArgumentException("item could no be found and therefor not be deleted");
+        }
 
+        _inventoryContext.delete(itemFormDb.get());
     }
 
     @Override
-    public void deleteItems(int accountId) {
+    public void deleteItemsFromAccount(int accountId) {
+        //TODO: sommige regels zijn niet SOLID omdat ze steeds herhaald worden. Dit is miss ook het geval in de BankAPI
+        //check if the account exists
+        Optional<Account> accountFromDb = _accountContext.findById(accountId);
+        if(!accountFromDb.isPresent()){
+            throw new IllegalArgumentException("can't find account in the system");
+        }
 
+        //check if the account contains any items
+        if(accountFromDb.get().getItems().isEmpty()){
+            throw new IllegalArgumentException("the given account doesn't contain any items");
+        }
+
+        //get all items and delete them
+        _inventoryContext.deleteAll(accountFromDb.get().getItems());
     }
 
     @Override
-    public void moveItem(int senderId, int reveiverId, Item item) {
+    public void moveItem(int senderId, int receiverId, Item item) {
+        //check if sender account exists
+        Optional<Account> senderAccountFromDb = _accountContext.findById(senderId);
+        if(!senderAccountFromDb.isPresent()){
+            throw new IllegalArgumentException("sender account doesn't exist");
+        }
 
+        //check if receiver account exists
+        Optional<Account> receiverAccountFromDb = _accountContext.findById(receiverId);
+        if(!receiverAccountFromDb.isPresent()){
+            throw new IllegalArgumentException("receiver account doesn't exist");
+        }
+
+        //check if the item exists //TODO: volgens mij kijkt hij nu naar de items in de item database en niet in de lijst van item in de sender account
+        Optional<Item> itemFromDb = _inventoryContext.findById(item.getId());
+        if(!itemFromDb.isPresent()){
+            throw new IllegalArgumentException("there is no such item found in the system");
+        }
+
+        //TODO: AFMAKEN!!
     }
 }

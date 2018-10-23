@@ -56,8 +56,6 @@ public class InventoryLogicTest {
         Account dummyAccount = new Account();
         Item dummyItem = new Item("", "dit is een test item", Item.Condition.FN, 0f);
 
-        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
-
         exception.expect(IllegalArgumentException.class);
         _logic.saveItem(dummyAccount, dummyItem);
 
@@ -111,5 +109,54 @@ public class InventoryLogicTest {
 
         exception.expect(IllegalArgumentException.class);
         _logic.getItemsFromAccount(dummyAccount.getId());
+    }
+
+    @Test
+    public void TestDeleteItemValid(){
+        Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
+
+        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.ofNullable(dummyItem));
+
+        _logic.deleteItem(dummyItem.getId());
+
+        verify(inventoryRepository, times(1)).delete(dummyItem);
+    }
+
+    @Test
+    public void TestDeleteItemUnvalid(){
+        Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
+
+        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.empty());
+
+        exception.expect(IllegalArgumentException.class);
+        _logic.deleteItem(dummyItem.getId());
+    }
+
+    @Test
+    public void TestDeleteItemsFromAccountValid(){
+        Account dummyAccount = new Account();
+        Item dummy1Item = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummy2Item = new Item("test2item", "dit is een test item", Item.Condition.FN, 10.50f);
+
+        Set<Item> dummyItems = new HashSet<>();
+        dummyItems.add(dummy1Item);
+        dummyItems.add(dummy2Item);
+        dummyAccount.setItems(dummyItems);
+
+        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
+
+        _logic.deleteItemsFromAccount(dummyAccount.getId());
+
+        verify(inventoryRepository, times(1)).deleteAll(dummyAccount.getItems());
+    }
+
+    @Test
+    public void TestDeleteItemsFromAccountUnvalid(){
+        Account dummyAccount = new Account();
+
+        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
+
+        exception.expect(IllegalArgumentException.class);
+        _logic.deleteItemsFromAccount(dummyAccount.getId());
     }
 }

@@ -41,16 +41,17 @@ public interface IInventoryLogic {
      * @param accountId the id of the account you want to delete all items from
      * @return nothing if everything goes correct
      * @throws IllegalArgumentException if the account doesn't exist in the database
+     * @throws IllegalArgumentException if the account doesn't contain any items
      */
-    void deleteItems(int accountId);
+    void deleteItemsFromAccount(int accountId);
 
     /**
      * @param senderId the id of the account that has the item in his inventory
-     * @param reveiverId the id of the account that wants to receive the item
+     * @param receiverId the id of the account that wants to receive the item
      * @param item the item you want to transfer
      * @return nothing if everything goes correct
      * @throws IllegalArgumentException if one of the accounts doesn't exist in the database
      * @throws IllegalArgumentException if the item doesn't exist
      */
-    void moveItem(int senderId, int reveiverId, Item item);
+    void moveItem(int senderId, int receiverId, Item item);
 }
