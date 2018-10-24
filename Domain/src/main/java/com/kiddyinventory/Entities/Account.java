@@ -1,5 +1,6 @@
 package com.kiddyinventory.Entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.springframework.hateoas.ResourceSupport;
 
@@ -13,6 +14,7 @@ public class Account extends ResourceSupport {
     @Id
     private int accountID;
 
+    @JsonManagedReference
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "AccountItem",

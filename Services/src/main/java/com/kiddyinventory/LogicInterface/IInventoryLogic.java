@@ -3,6 +3,7 @@ package com.kiddyinventory.LogicInterface;
 import com.kiddyinventory.Entities.Account;
 import com.kiddyinventory.Entities.Item;
 
+import java.util.List;
 import java.util.Set;
 
 public interface IInventoryLogic {
@@ -28,7 +29,7 @@ public interface IInventoryLogic {
      * @throws IllegalArgumentException if the account doesn't exist in the database
      * @throws IllegalArgumentException if the account doesn't posses any items
      */
-    Set<Item> getItemsFromAccount(int accountId);
+    List<Item> getItemsFromAccount(int accountId);
 
     /**
      * @param itemId the id of the item you want to delete

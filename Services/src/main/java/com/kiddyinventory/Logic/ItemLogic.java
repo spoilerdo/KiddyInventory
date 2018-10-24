@@ -1,6 +1,6 @@
 package com.kiddyinventory.Logic;
 
-import com.kiddyinventory.DataInterfaces.IInventoryRepository;
+import com.kiddyinventory.DataInterfaces.IItemRepository;
 import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.LogicInterface.IItemLogic;
 import org.assertj.core.util.Strings;
@@ -11,10 +11,10 @@ import java.util.Optional;
 
 @Service
 public class ItemLogic implements IItemLogic {
-    private IInventoryRepository itemRepository;
+    private IItemRepository itemRepository;
 
     @Autowired
-    public ItemLogic(IInventoryRepository itemRepository) {
+    public ItemLogic(IItemRepository itemRepository) {
         this.itemRepository = itemRepository;
     }
 
@@ -31,7 +31,7 @@ public class ItemLogic implements IItemLogic {
     }
 
     @Override
-    public void deleteItem(int itemID) {
+    public void deleteItem(int itemID) throws IllegalArgumentException{
         Optional<Item> foundItem = itemRepository.findById(itemID);
 
         if(!foundItem.isPresent()) {
@@ -42,7 +42,7 @@ public class ItemLogic implements IItemLogic {
     }
 
     @Override
-    public void updateItem(Item item) {
+    public void updateItem(Item item) throws IllegalArgumentException {
         Optional<Item> foundItem = itemRepository.findById(item.getItemID());
 
         if(!foundItem.isPresent()) {
@@ -53,7 +53,7 @@ public class ItemLogic implements IItemLogic {
     }
 
     @Override
-    public Item getItem(int itemID) {
+    public Item getItem(int itemID) throws IllegalArgumentException {
         Optional<Item> foundItem = itemRepository.findById(itemID);
 
         if(!foundItem.isPresent()) {

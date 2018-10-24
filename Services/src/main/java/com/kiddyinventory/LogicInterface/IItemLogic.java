@@ -12,7 +12,7 @@ public interface IItemLogic {
     Item createItem(Item item);
     /**
      * delete item with given parameter
-     * @param item the item you want to delete
+     * @param itemID the id of the item you want to delete
      * @return nothing
      * @throws IllegalArgumentException if item values are empty or item is not found in the system.
      */

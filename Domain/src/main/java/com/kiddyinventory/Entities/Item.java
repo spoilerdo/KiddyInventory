@@ -1,5 +1,6 @@
 package com.kiddyinventory.Entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.kiddyinventory.Enums.Condition;
 import org.springframework.hateoas.ResourceSupport;
@@ -20,6 +21,7 @@ public class Item extends ResourceSupport {
     private Condition condition;
     private Float price;
 
+    @JsonBackReference
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "items")
     private Set<Account> accounts = new HashSet<>();
 

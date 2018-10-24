@@ -3,7 +3,8 @@ package com.kiddyinventory.LogicTests;
 import com.kiddyinventory.Entities.Account;
 import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.DataInterfaces.IAccountRepository;
-import com.kiddyinventory.DataInterfaces.IInventoryRepository;
+import com.kiddyinventory.DataInterfaces.IItemRepository;
+import com.kiddyinventory.Enums.Condition;
 import com.kiddyinventory.Logic.InventoryLogic;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
@@ -11,22 +12,20 @@ import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryLogicTest {
 
-    //Add exception dependencie
+    //Add exception dependency
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
     //Mock repos
     @Mock
-    private IInventoryRepository inventoryRepository;
+    private IItemRepository inventoryRepository;
     @Mock
     private IAccountRepository accountRepository;
 
@@ -42,7 +41,7 @@ public class InventoryLogicTest {
     @Test
     public void TestSaveItemValid(){
         Account dummyAccount = new Account();
-        Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
 
         when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
@@ -54,7 +53,7 @@ public class InventoryLogicTest {
     @Test
     public void TestSaveItemUnvalid(){
         Account dummyAccount = new Account();
-        Item dummyItem = new Item("", "dit is een test item", Item.Condition.FN, 0f);
+        Item dummyItem = new Item("", "dit is een test item", Condition.FN, 0f);
 
         exception.expect(IllegalArgumentException.class);
         _logic.saveItem(dummyAccount, dummyItem);
@@ -64,7 +63,7 @@ public class InventoryLogicTest {
 
     @Test
     public void TestGetItemValid(){
-        Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
 
         when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
 
@@ -75,7 +74,7 @@ public class InventoryLogicTest {
 
     @Test
     public void TestGetItemUnvalid(){
-        Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
 
         when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
@@ -86,17 +85,17 @@ public class InventoryLogicTest {
     @Test
     public void TestGetItemsFromAccountValid(){
         Account dummyAccount = new Account();
-        Item dummy1Item = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
-        Item dummy2Item = new Item("test2item", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummy1Item = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
+        Item dummy2Item = new Item("test2item", "dit is een test item", Condition.FN, 10.50f);
 
-        Set<Item> dummyItems = new HashSet<>();
+        List<Item> dummyItems = new ArrayList<>();
         dummyItems.add(dummy1Item);
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
         when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
-        Set<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getAccountID());
+        List<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getAccountID());
 
         Assert.assertEquals(dummyItems, itemsFromDb);
     }
@@ -113,7 +112,7 @@ public class InventoryLogicTest {
 
     @Test
     public void TestDeleteItemValid(){
-        Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
 
         when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
 
@@ -124,7 +123,7 @@ public class InventoryLogicTest {
 
     @Test
     public void TestDeleteItemUnvalid(){
-        Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
 
         when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
@@ -135,10 +134,10 @@ public class InventoryLogicTest {
     @Test
     public void TestDeleteItemsFromAccountValid(){
         Account dummyAccount = new Account();
-        Item dummy1Item = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
-        Item dummy2Item = new Item("test2item", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummy1Item = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
+        Item dummy2Item = new Item("test2item", "dit is een test item", Condition.FN, 10.50f);
 
-        Set<Item> dummyItems = new HashSet<>();
+        List<Item> dummyItems = new ArrayList<>();
         dummyItems.add(dummy1Item);
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
