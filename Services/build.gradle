@@ -1,6 +1,7 @@
 dependencies{
     testCompile("org.springframework.boot:spring-boot-starter-test")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.springframework.boot:spring-boot-starter-security")
     compile group: 'org.mindrot', name: 'jbcrypt', version: '0.4'
     compile project(':Domain')
     compile project(':Data')

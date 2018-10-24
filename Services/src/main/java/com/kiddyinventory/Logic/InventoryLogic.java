@@ -1,7 +1,7 @@
 package com.kiddyinventory.Logic;
 
-import com.kiddinventory.Entities.Account;
-import com.kiddinventory.Entities.Item;
+import com.kiddyinventory.Entities.Account;
+import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.DataInterfaces.IAccountRepository;
 import com.kiddyinventory.DataInterfaces.IInventoryRepository;
 import com.kiddyinventory.LogicInterface.IInventoryLogic;
@@ -26,14 +26,14 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public void saveItem(Account account, Item item) throws IllegalArgumentException {
         //check if all item values are not null
-        if(Strings.isNullOrEmpty(item.getName()) || Strings.isNullOrEmpty(item.getDiscription()) || item.getCondition() == null || item.getPrice() == null || item.getPrice() == 0){
+        if(Strings.isNullOrEmpty(item.getName()) || Strings.isNullOrEmpty(item.getDescription()) || item.getCondition() == null || item.getPrice() == null || item.getPrice() == 0){
             throw new IllegalArgumentException("Values cannot be null");
         }
 
         //check if user is exists in de db
-        Optional<Account> accountFromDb = _accountContext.findById(account.getId());
+        Optional<Account> accountFromDb = _accountContext.findById(account.getAccountID());
         if(!accountFromDb.isPresent()){
-            throw new IllegalArgumentException("Account with id: " + String.valueOf(account.getId()) + "not found in the system");
+            throw new IllegalArgumentException("Account with id: " + String.valueOf(account.getAccountID()) + "not found in the system");
         }
 
         account.getItems().add(item);
@@ -113,7 +113,7 @@ public class InventoryLogic implements IInventoryLogic {
         }
 
         //check if the item exists //TODO: volgens mij kijkt hij nu naar de items in de item database en niet in de lijst van item in de sender account
-        Optional<Item> itemFromDb = _inventoryContext.findById(item.getId());
+        Optional<Item> itemFromDb = _inventoryContext.findById(item.getItemID());
         if(!itemFromDb.isPresent()){
             throw new IllegalArgumentException("there is no such item found in the system");
         }

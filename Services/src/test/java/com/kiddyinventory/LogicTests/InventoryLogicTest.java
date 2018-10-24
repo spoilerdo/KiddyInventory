@@ -1,7 +1,7 @@
 package com.kiddyinventory.LogicTests;
 
-import com.kiddinventory.Entities.Account;
-import com.kiddinventory.Entities.Item;
+import com.kiddyinventory.Entities.Account;
+import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.DataInterfaces.IAccountRepository;
 import com.kiddyinventory.DataInterfaces.IInventoryRepository;
 import com.kiddyinventory.Logic.InventoryLogic;
@@ -44,7 +44,7 @@ public class InventoryLogicTest {
         Account dummyAccount = new Account();
         Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
 
-        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
         _logic.saveItem(dummyAccount, dummyItem);
 
@@ -66,9 +66,9 @@ public class InventoryLogicTest {
     public void TestGetItemValid(){
         Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
 
-        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.ofNullable(dummyItem));
+        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
 
-        Item itemFromDb = _logic.getItem(dummyItem.getId());
+        Item itemFromDb = _logic.getItem(dummyItem.getItemID());
 
         Assert.assertEquals(dummyItem, itemFromDb);
     }
@@ -77,10 +77,10 @@ public class InventoryLogicTest {
     public void TestGetItemUnvalid(){
         Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
 
-        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.empty());
+        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
         exception.expect(IllegalArgumentException.class);
-        _logic.getItem(dummyItem.getId());
+        _logic.getItem(dummyItem.getItemID());
     }
 
     @Test
@@ -94,9 +94,9 @@ public class InventoryLogicTest {
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
-        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
-        Set<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getId());
+        Set<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getAccountID());
 
         Assert.assertEquals(dummyItems, itemsFromDb);
     }
@@ -105,19 +105,19 @@ public class InventoryLogicTest {
     public void TestGetItemsFromAccountUnvalid(){
         Account dummyAccount = new Account();
 
-        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
         exception.expect(IllegalArgumentException.class);
-        _logic.getItemsFromAccount(dummyAccount.getId());
+        _logic.getItemsFromAccount(dummyAccount.getAccountID());
     }
 
     @Test
     public void TestDeleteItemValid(){
         Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
 
-        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.ofNullable(dummyItem));
+        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
 
-        _logic.deleteItem(dummyItem.getId());
+        _logic.deleteItem(dummyItem.getItemID());
 
         verify(inventoryRepository, times(1)).delete(dummyItem);
     }
@@ -126,10 +126,10 @@ public class InventoryLogicTest {
     public void TestDeleteItemUnvalid(){
         Item dummyItem = new Item("testitem", "dit is een test item", Item.Condition.FN, 10.50f);
 
-        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.empty());
+        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
         exception.expect(IllegalArgumentException.class);
-        _logic.deleteItem(dummyItem.getId());
+        _logic.deleteItem(dummyItem.getItemID());
     }
 
     @Test
@@ -143,9 +143,9 @@ public class InventoryLogicTest {
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
-        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
-        _logic.deleteItemsFromAccount(dummyAccount.getId());
+        _logic.deleteItemsFromAccount(dummyAccount.getAccountID());
 
         verify(inventoryRepository, times(1)).deleteAll(dummyAccount.getItems());
     }
@@ -154,9 +154,9 @@ public class InventoryLogicTest {
     public void TestDeleteItemsFromAccountUnvalid(){
         Account dummyAccount = new Account();
 
-        when(accountRepository.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
         exception.expect(IllegalArgumentException.class);
-        _logic.deleteItemsFromAccount(dummyAccount.getId());
+        _logic.deleteItemsFromAccount(dummyAccount.getAccountID());
     }
 }

@@ -1,6 +1,8 @@
-package com.kiddinventory.Entities;
+package com.kiddyinventory.Entities;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.kiddyinventory.Enums.Condition;
+import org.springframework.hateoas.ResourceSupport;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -8,40 +10,38 @@ import java.util.Set;
 
 @Entity
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class Item {
+public class Item extends ResourceSupport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int itemID;
     private String name;
-    private String discription;
+    private String description;
     private Condition condition;
     private Float price;
 
-    public enum Condition {FN, MW, FT, WW, BS}
-
-    @ManyToMany(cascade = CascadeType.PERSIST, mappedBy = "items")
+    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "items")
     private Set<Account> accounts = new HashSet<>();
 
     public Item() {}
 
-    public Item(String name, String discription, Condition condition, Float price){
+    public Item(String name, String description, Condition condition, Float price){
         this.name = name;
-        this.discription = discription;
+        this.description = description;
         this.condition = condition;
         this.price = price;
     }
 
-    public int getId() {
-        return id;
+    public int getItemID() {
+        return itemID;
     }
 
     public String getName() {
         return name;
     }
 
-    public String getDiscription() {
-        return discription;
+    public String getDescription() {
+        return description;
     }
 
     public Condition getCondition() {

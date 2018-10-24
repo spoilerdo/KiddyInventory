@@ -1,7 +1,7 @@
 package com.kiddyinventory.LogicInterface;
 
-import com.kiddinventory.Entities.Account;
-import com.kiddinventory.Entities.Item;
+import com.kiddyinventory.Entities.Account;
+import com.kiddyinventory.Entities.Item;
 
 import java.util.Set;
 
