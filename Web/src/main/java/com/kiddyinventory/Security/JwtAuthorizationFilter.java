@@ -4,6 +4,8 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
@@ -13,6 +15,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static com.kiddyinventory.Security.SecurityConstants.SecurityConstants.HEADER_STRING;
 import static com.kiddyinventory.Security.SecurityConstants.SecurityConstants.JWTKEY;
@@ -47,9 +51,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
             // parse the token.
             Claims userClaim =  Jwts.parser().setSigningKey(JWTKEY).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
 
+            //retrieve roles from JWT token and convert to grantedauthority
+            List<String> scopes = (List<String>) userClaim.get("scopes");
+            List<GrantedAuthority> authorities = scopes.stream()
+                    .map(authority -> new SimpleGrantedAuthority(authority))
+                    .collect(Collectors.toList());
 
             if (userClaim.getSubject() != null) {
-                return new UsernamePasswordAuthenticationToken(userClaim.getSubject(), null, new ArrayList<>());
+                return new UsernamePasswordAuthenticationToken(userClaim.getSubject(), null, authorities);
             }
             return null;
         }
