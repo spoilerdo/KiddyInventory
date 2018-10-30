@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Controller
 @RequestMapping("/item")
 public class ItemController {
@@ -39,5 +41,11 @@ public class ItemController {
     public ResponseEntity<Item> getItem(@PathVariable("id") int itemID) {
         Item foundItem = itemLogic.getItem(itemID);
         return new ResponseEntity<>(foundItem, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "")
+    public ResponseEntity<Iterable<Item>> getAllItems() {
+        Iterable<Item> items = itemLogic.getAllItems();
+        return new ResponseEntity<>(items, HttpStatus.OK);
     }
 }

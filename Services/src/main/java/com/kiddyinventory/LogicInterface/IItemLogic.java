@@ -31,4 +31,10 @@ public interface IItemLogic {
      * @throws IllegalArgumentException if item is not found in the system.
      */
     Item getItem(int itemID);
+
+    /**
+     * get all items
+     * @return a list of items
+     */
+    Iterable<Item> getAllItems();
 }

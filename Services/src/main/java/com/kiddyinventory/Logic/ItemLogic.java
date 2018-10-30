@@ -62,4 +62,9 @@ public class ItemLogic implements IItemLogic {
 
         return foundItem.get();
     }
+
+    @Override
+    public Iterable<Item> getAllItems() {
+        return itemRepository.findAll();
+    }
 }
