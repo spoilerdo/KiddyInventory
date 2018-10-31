@@ -30,8 +30,8 @@ public class InventoryLogic implements IInventoryLogic {
             throw new IllegalArgumentException("Values cannot be null");
         }
 
-        //check if user is exists in de db
-        CheckUserExistsInDB(account.getId());
+        //check if user exists in de db
+        checkUserExistsInDb(account.getId());
 
         account.getItems().add(item);
         _inventoryContext.save(item);
@@ -40,7 +40,7 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public Item getItem(int itemId) {
         //check if item exists in the database
-        Optional<Item> itemFromDb = CheckItemExistsInDB(itemId);
+        Optional<Item> itemFromDb = checkItemExistsInDb(itemId);
 
         //the item has been found and returned to the user
         return itemFromDb.get();
@@ -49,10 +49,10 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public List<Item> getItemsFromAccount(int accountId) {
         //check if the account exists in the database
-        Optional<Account> accountFromDb = CheckUserExistsInDB(accountId);
+        Optional<Account> accountFromDb = checkUserExistsInDb(accountId);
 
         //check if the account has any items
-        CheckAccountContainsItems(accountFromDb.get());
+        checkAccountContainsItems(accountFromDb.get());
 
         //return all the items found from the given account
         return accountFromDb.get().getItems();
@@ -61,7 +61,7 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public void deleteItem(int itemId) {
         //check if the items exists in the database
-        Optional<Item> itemFormDb = CheckItemExistsInDB(itemId);
+        Optional<Item> itemFormDb = checkItemExistsInDb(itemId);
 
         _inventoryContext.delete(itemFormDb.get());
     }
@@ -69,10 +69,10 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public void deleteItemsFromAccount(int accountId) {
         //check if the account exists
-        Optional<Account> accountFromDb = CheckUserExistsInDB(accountId);
+        Optional<Account> accountFromDb = checkUserExistsInDb(accountId);
 
         //check if the account contains any items
-        CheckAccountContainsItems(accountFromDb.get());
+        checkAccountContainsItems(accountFromDb.get());
 
         //get all items and delete them
         _inventoryContext.deleteAll(accountFromDb.get().getItems());
@@ -81,13 +81,13 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public void moveItem(int senderId, int receiverId, Item item) {
         //check if the item exists in the db
-        Optional<Item> itemFromDb = CheckItemExistsInDB(item.getId());
+        Optional<Item> itemFromDb = checkItemExistsInDb(item.getId());
 
         //check if sender account exists
-        Optional<Account> senderAccountFromDb = CheckUserExistsInDB(senderId);
+        Optional<Account> senderAccountFromDb = checkUserExistsInDb(senderId);
 
         //check if receiver account exists
-        Optional<Account> receiverAccountFromDb = CheckUserExistsInDB(receiverId);
+        Optional<Account> receiverAccountFromDb = checkUserExistsInDb(receiverId);
 
         //check if the sender has the given item in his inventory
         if(!senderAccountFromDb.get().getItems().contains(item)){
@@ -105,7 +105,8 @@ public class InventoryLogic implements IInventoryLogic {
         _accountContext.save(receiver);
     }
 
-    private Optional<Account> CheckUserExistsInDB(int accountId){
+    //region Generic exception methods
+    private Optional<Account> checkUserExistsInDb(int accountId){
         Optional<Account> accountFromDb = _accountContext.findById(accountId);
         if(!accountFromDb.isPresent()){
             throw new IllegalArgumentException("Account with id: " + String.valueOf(accountId) + " not found in the system");
@@ -113,7 +114,8 @@ public class InventoryLogic implements IInventoryLogic {
 
         return accountFromDb;
     }
-    private Optional<Item> CheckItemExistsInDB(int itemId){
+
+    private Optional<Item> checkItemExistsInDb(int itemId){
         Optional<Item> itemFromDb = _inventoryContext.findById(itemId);
         if(!itemFromDb.isPresent()){
             throw new IllegalArgumentException("Item with id: " + String.valueOf(itemId) + " not found in the system");
@@ -121,9 +123,11 @@ public class InventoryLogic implements IInventoryLogic {
 
         return itemFromDb;
     }
-    private void CheckAccountContainsItems(Account account){
+
+    private void checkAccountContainsItems(Account account){
         if(account.getItems().isEmpty()){
             throw new IllegalArgumentException("Account with id: " + String.valueOf(account.getId()) + " doesn't contain any items");
         }
     }
+    //endregion
 }
