@@ -14,7 +14,6 @@ public class Account extends ResourceSupport {
     @Id
     private int accountID;
 
-    @JsonManagedReference
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "AccountItem",
