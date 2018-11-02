@@ -1,9 +1,9 @@
 package com.kiddyinventory.Logic;
 
-import com.kiddinventory.Entities.Account;
-import com.kiddinventory.Entities.Item;
+import com.kiddyinventory.Entities.Account;
+import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.DataInterfaces.IAccountRepository;
-import com.kiddyinventory.DataInterfaces.IInventoryRepository;
+import com.kiddyinventory.DataInterfaces.IItemRepository;
 import com.kiddyinventory.LogicInterface.IInventoryLogic;
 import org.assertj.core.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,19 +14,19 @@ import java.util.Optional;
 
 @Service
 public class InventoryLogic implements IInventoryLogic {
-    private IInventoryRepository _inventoryContext;
+    private IItemRepository _itemContext;
     private IAccountRepository _accountContext;
 
     @Autowired
-    public InventoryLogic(IInventoryRepository inventoryContext, IAccountRepository accountContext){
-        this._inventoryContext = inventoryContext;
+    public InventoryLogic(IItemRepository inventoryContext, IAccountRepository accountContext){
+        this._itemContext = inventoryContext;
         this._accountContext = accountContext;
     }
 
     @Override
     public void saveItem(Account account, Item item) throws IllegalArgumentException {
         //check if all item values are not null
-        if(Strings.isNullOrEmpty(item.getName()) || Strings.isNullOrEmpty(item.getDiscription()) || item.getCondition() == null || item.getPrice() == null || item.getPrice() == 0){
+        if(Strings.isNullOrEmpty(item.getName()) || Strings.isNullOrEmpty(item.getDescription()) || item.getCondition() == null || item.getPrice() == null || item.getPrice() == 0){
             throw new IllegalArgumentException("Values cannot be null");
         }
 
@@ -34,7 +34,7 @@ public class InventoryLogic implements IInventoryLogic {
         checkUserExistsInDb(account.getId());
 
         account.getItems().add(item);
-        _inventoryContext.save(item);
+        _itemContext.save(item);
     }
 
     @Override
@@ -63,7 +63,7 @@ public class InventoryLogic implements IInventoryLogic {
         //check if the items exists in the database
         Optional<Item> itemFormDb = checkItemExistsInDb(itemId);
 
-        _inventoryContext.delete(itemFormDb.get());
+        _itemContext.delete(itemFormDb.get());
     }
 
     @Override
@@ -75,7 +75,7 @@ public class InventoryLogic implements IInventoryLogic {
         checkAccountContainsItems(accountFromDb.get());
 
         //get all items and delete them
-        _inventoryContext.deleteAll(accountFromDb.get().getItems());
+        _itemContext.deleteAll(accountFromDb.get().getItems());
     }
 
     @Override

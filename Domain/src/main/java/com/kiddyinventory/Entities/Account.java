@@ -1,21 +1,20 @@
-package com.kiddinventory.Entities;
+package com.kiddyinventory.Entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.springframework.hateoas.ResourceSupport;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class Account {
+public class Account extends ResourceSupport {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int accountID;
 
-    @ManyToMany(cascade = CascadeType.PERSIST)
+    @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
             name = "AccountItem",
             joinColumns = {@JoinColumn(name = "AccountID")},
@@ -25,12 +24,12 @@ public class Account {
 
     public Account() {}
 
-    public int getId() {
-        return id;
+    public int getAccountID() {
+        return accountID;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setAccountID(int accountID) {
+        this.accountID = accountID;
     }
 
     public List<Item> getItems() {
