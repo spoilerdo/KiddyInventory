@@ -1,6 +1,7 @@
 package com.kiddyinventory.Controller;
 
 import com.kiddyinventory.Entities.Item;
+import com.kiddyinventory.Enums.Condition;
 import com.kiddyinventory.LogicInterface.IItemLogic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -47,5 +48,11 @@ public class ItemController {
     public ResponseEntity<Iterable<Item>> getAllItems() {
         Iterable<Item> items = itemLogic.getAllItems();
         return new ResponseEntity<>(items, HttpStatus.OK);
+    }
+
+    @GetMapping(path = "/conditions")
+    public ResponseEntity<List<Condition>> getAllConditions(){
+        List<Condition> conditions = itemLogic.getAllConditions();
+        return new ResponseEntity<>(conditions, HttpStatus.OK);
     }
 }
