@@ -95,7 +95,7 @@ public class InventoryLogicTest {
 
         when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
-        List<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getId());
+        List<Item> itemsFromDb = _logic.getItemsFromAccount(dummyAccount.getAccountID());
 
         Assert.assertEquals(dummyItems, itemsFromDb);
     }
@@ -163,40 +163,40 @@ public class InventoryLogicTest {
     public void TestMoveItemValid(){
         Account dummy1Account = new Account();
         Account dummy2Account = new Account();
-        dummy2Account.setId(1);
-        Item dummyItem = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
+        dummy2Account.setAccountID(1);
+        Item dummyItem = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
         dummy1Account.setItems(new ArrayList<>(Arrays.asList(dummyItem)));
 
-        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.ofNullable(dummyItem));
-        when(accountRepository.findById(dummy1Account.getId())).thenReturn(Optional.ofNullable(dummy1Account));
-        when(accountRepository.findById(dummy2Account.getId())).thenReturn(Optional.ofNullable(dummy2Account));
+        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+        when(accountRepository.findById(dummy1Account.getAccountID())).thenReturn(Optional.ofNullable(dummy1Account));
+        when(accountRepository.findById(dummy2Account.getAccountID())).thenReturn(Optional.ofNullable(dummy2Account));
 
-        _logic.moveItem(dummy1Account.getId(), dummy2Account.getId(), dummyItem);
+        _logic.moveItem(dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem);
     }
 
     @Test
     public void TestMoveItemNotInDb(){
         Account dummy1Account = new Account();
         Account dummy2Account = new Account();
-        Item dummyItem = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummyItem = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
 
-        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.empty());
+        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
         exception.expect(IllegalArgumentException.class);
-        _logic.moveItem(dummy1Account.getId(), dummy2Account.getId(), dummyItem);
+        _logic.moveItem(dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem);
     }
 
     @Test
     public void TestMoveItemSenderDoesntContainItem(){
         Account dummy1Account = new Account();
         Account dummy2Account = new Account();
-        Item dummyItem = new Item("test1item", "dit is een test item", Item.Condition.FN, 10.50f);
+        Item dummyItem = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
 
-        when(inventoryRepository.findById(dummyItem.getId())).thenReturn(Optional.ofNullable(dummyItem));
-        when(accountRepository.findById(dummy1Account.getId())).thenReturn(Optional.ofNullable(dummy1Account));
-        when(accountRepository.findById(dummy2Account.getId())).thenReturn(Optional.ofNullable(dummy2Account));
+        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+        when(accountRepository.findById(dummy1Account.getAccountID())).thenReturn(Optional.ofNullable(dummy1Account));
+        when(accountRepository.findById(dummy2Account.getAccountID())).thenReturn(Optional.ofNullable(dummy2Account));
 
         exception.expect(IllegalArgumentException.class);
-        _logic.moveItem(dummy1Account.getId(), dummy2Account.getId(), dummyItem);
+        _logic.moveItem(dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem);
     }
 }

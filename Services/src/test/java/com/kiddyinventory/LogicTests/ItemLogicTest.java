@@ -51,9 +51,9 @@ public class ItemLogicTest {
 
         Item returnedItem = itemLogic.createItem(dummyItem);
 
-        //Controleren of juiste item is gereturned
+        //Check if the right item is returned
         Assert.assertEquals(dummyItem, returnedItem);
-        //Controleren of repository save functie is aangeroepen
+        //Check if the sace function is called in the repo
         verify(itemRepository, times(1)).save(dummyItem);
     }
 

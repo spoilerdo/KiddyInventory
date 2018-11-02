@@ -12,6 +12,4 @@ public class InventoryController {
     public InventoryController(IInventoryLogic inventoryLogic) {
         this.inventoryLogic = inventoryLogic;
     }
-
-
 }

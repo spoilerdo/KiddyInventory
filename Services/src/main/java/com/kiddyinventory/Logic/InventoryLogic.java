@@ -18,8 +18,8 @@ public class InventoryLogic implements IInventoryLogic {
     private IAccountRepository _accountContext;
 
     @Autowired
-    public InventoryLogic(IItemRepository inventoryContext, IAccountRepository accountContext){
-        this._itemContext = inventoryContext;
+    public InventoryLogic(IItemRepository itemContext, IAccountRepository accountContext){
+        this._itemContext = itemContext;
         this._accountContext = accountContext;
     }
 
@@ -31,7 +31,7 @@ public class InventoryLogic implements IInventoryLogic {
         }
 
         //check if user exists in de db
-        checkUserExistsInDb(account.getId());
+        checkUserExistsInDb(account.getAccountID());
 
         account.getItems().add(item);
         _itemContext.save(item);
@@ -81,7 +81,8 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public void moveItem(int senderId, int receiverId, Item item) {
         //check if the item exists in the db
-        Optional<Item> itemFromDb = checkItemExistsInDb(item.getId());
+        Optional<Item> itemFromDb = checkItemExistsInDb(item.getItemID());
+        item = itemFromDb.get();
 
         //check if sender account exists
         Optional<Account> senderAccountFromDb = checkUserExistsInDb(senderId);
@@ -116,7 +117,7 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     private Optional<Item> checkItemExistsInDb(int itemId){
-        Optional<Item> itemFromDb = _inventoryContext.findById(itemId);
+        Optional<Item> itemFromDb = _itemContext.findById(itemId);
         if(!itemFromDb.isPresent()){
             throw new IllegalArgumentException("Item with id: " + String.valueOf(itemId) + " not found in the system");
         }
