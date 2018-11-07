@@ -1,5 +1,7 @@
 package com.kiddyinventory.Logic;
 
+import com.kiddyinventory.DataInterfaces.IAccountRepository;
+import com.kiddyinventory.Entities.Account;
 import net.minidev.json.JSONValue;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -14,12 +16,20 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.Optional;
+
 import static java.util.Collections.emptyList;
 
 @Service
 public class AuthLogic implements UserDetailsService {
-    @Autowired
     private HttpServletRequest request;
+    private IAccountRepository accountRepository;
+
+    @Autowired
+    public AuthLogic(HttpServletRequest request, IAccountRepository accountRepository) {
+        this.request = request;
+        this.accountRepository = accountRepository;
+    }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
@@ -44,6 +54,16 @@ public class AuthLogic implements UserDetailsService {
         }
 
         try {
+            //Save user to inventory database if he does not exist in it yet
+            int accountID = account.getInt("id");
+            Optional<Account> foundAccount = accountRepository.findById(accountID);
+
+            if(!foundAccount.isPresent()) {
+                Account newAccount = new Account();
+                newAccount.setAccountID(accountID);
+                accountRepository.save(newAccount);
+            }
+
             User foundUser = new User(account.getString("username"), account.getString("password"), emptyList());
             return foundUser;
         } catch(JSONException e) {
