@@ -9,6 +9,7 @@ import org.assertj.core.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,110 +25,145 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     @Override
-    public void saveItem(Account account, Item item) throws IllegalArgumentException {
-        //check if all item values are not null
-        if(Strings.isNullOrEmpty(item.getName()) || Strings.isNullOrEmpty(item.getDescription()) || item.getCondition() == null || item.getPrice() == null || item.getPrice() == 0){
-            throw new IllegalArgumentException("Values cannot be null");
+    public void saveItem(Principal user , int accountID, int itemID) throws IllegalArgumentException {
+        Item foundItem = checkItemExistsInDb(itemID);
+
+        //TODO check of principal matched met accountID
+        if(!checkUserMatches(user.getName(), accountID)) {
+            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
         }
-
         //check if user exists in de db
-        checkUserExistsInDb(account.getAccountID());
+        Account foundAccount = checkUserExistsInDb(accountID);
 
-        account.getItems().add(item);
-        _itemContext.save(item);
+        foundAccount.getItems().add(foundItem);
+        foundItem.getAccounts().add(foundAccount);
+
+        _accountContext.save(foundAccount);
     }
 
     @Override
-    public Item getItem(int itemId) {
+    public Item getItem(Principal user, int itemId) {
         //check if item exists in the database
-        Optional<Item> itemFromDb = checkItemExistsInDb(itemId);
-
-        //the item has been found and returned to the user
-        return itemFromDb.get();
+        return checkAccountHasItem(user.getName(), itemId);
     }
 
     @Override
-    public List<Item> getItemsFromAccount(int accountId) {
+    public List<Item> getItemsFromAccount(Principal user, int accountId) {
+        if(!checkUserMatches(user.getName(), accountId)) {
+            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
+        }
         //check if the account exists in the database
-        Optional<Account> accountFromDb = checkUserExistsInDb(accountId);
+        Account accountFromDb = checkUserExistsInDb(accountId);
 
         //check if the account has any items
-        checkAccountContainsItems(accountFromDb.get());
+        checkAccountContainsItems(accountFromDb);
 
         //return all the items found from the given account
-        return accountFromDb.get().getItems();
+        return accountFromDb.getItems();
     }
 
     @Override
-    public void deleteItem(int itemId) {
+    public void deleteItem(Principal user, int itemId) {
         //check if the items exists in the database
-        Optional<Item> itemFormDb = checkItemExistsInDb(itemId);
+        Item itemFormDb = checkAccountHasItem(user.getName(), itemId);
 
-        _itemContext.delete(itemFormDb.get());
+        _itemContext.delete(itemFormDb);
     }
 
     @Override
-    public void deleteItemsFromAccount(int accountId) {
+    public void deleteItemsFromAccount(Principal user, int accountId) {
+        //check if he has access to make this call
+        if(!checkUserMatches(user.getName(), accountId)) {
+            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
+        }
         //check if the account exists
-        Optional<Account> accountFromDb = checkUserExistsInDb(accountId);
+        Account accountFromDb = checkUserExistsInDb(accountId);
 
         //check if the account contains any items
-        checkAccountContainsItems(accountFromDb.get());
+        checkAccountContainsItems(accountFromDb);
 
         //get all items and delete them
-        _itemContext.deleteAll(accountFromDb.get().getItems());
+        _itemContext.deleteAll(accountFromDb.getItems());
     }
 
     @Override
-    public void moveItem(int senderId, int receiverId, Item item) {
+    public void moveItem(Principal user, int senderId, int receiverId, int itemID) {
         //check if the item exists in the db
-        Optional<Item> itemFromDb = checkItemExistsInDb(item.getItemID());
-        item = itemFromDb.get();
+        Item itemFromDb = checkAccountHasItem(user.getName() ,itemID);
+
+        if(!checkUserMatches(user.getName(), senderId)) {
+            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
+        }
 
         //check if sender account exists
-        Optional<Account> senderAccountFromDb = checkUserExistsInDb(senderId);
+        Account senderAccountFromDb = checkUserExistsInDb(senderId);
 
         //check if receiver account exists
-        Optional<Account> receiverAccountFromDb = checkUserExistsInDb(receiverId);
+        Account receiverAccountFromDb = checkUserExistsInDb(receiverId);
 
         //check if the sender has the given item in his inventory
-        if(!senderAccountFromDb.get().getItems().contains(item)){
+        if(!senderAccountFromDb.getItems().contains(itemFromDb)){
             throw new IllegalArgumentException("sender doesn't have the given item in his inventory");
         }
 
         //move the item from sender to receiver
-        Account sender = senderAccountFromDb.get();
-        sender.getItems().remove(item);
+        senderAccountFromDb.getItems().remove(itemFromDb);
+        receiverAccountFromDb.getItems().add(itemFromDb);
 
-        Account receiver = receiverAccountFromDb.get();
-        receiver.getItems().add(item);
-
-        _accountContext.save(sender);
-        _accountContext.save(receiver);
+        _accountContext.save(senderAccountFromDb);
+        _accountContext.save(receiverAccountFromDb);
     }
 
     //region Generic exception methods
-    private Optional<Account> checkUserExistsInDb(int accountId){
+    private Account checkUserExistsInDb(int accountId){
         Optional<Account> accountFromDb = _accountContext.findById(accountId);
         if(!accountFromDb.isPresent()){
-            throw new IllegalArgumentException("Account with id: " + String.valueOf(accountId) + " not found in the system");
+            throw new IllegalArgumentException("Account with id: " + accountId + " not found in the system");
         }
 
-        return accountFromDb;
+        return accountFromDb.get();
     }
 
-    private Optional<Item> checkItemExistsInDb(int itemId){
-        Optional<Item> itemFromDb = _itemContext.findById(itemId);
-        if(!itemFromDb.isPresent()){
-            throw new IllegalArgumentException("Item with id: " + String.valueOf(itemId) + " not found in the system");
+    private boolean checkUserMatches(String username, int accountID) {
+        //TODO : MAKE CALL TO SERVER WITH USERNAME TO GET USER DATA
+
+        //TODO CHECK IF MATCHES
+        return false;
+    }
+
+    private Item checkAccountHasItem(String username, int itemID) {
+        //TODO : MAKE CALL TO BANK API FOR USER DATA AND CHECK IF THE ACCOUNT ID MATCHES IN THE LIST OF GETACCOUNTS FROM ITEM
+        int accountid = 0;
+
+
+        Optional<Item> itemfromDb = _itemContext.findById(itemID);
+        if(!itemfromDb.isPresent()){
+            throw new IllegalArgumentException("Item with id: " +itemID + " not found in the system");
         }
 
-        return itemFromDb;
+        Item item = itemfromDb.get();
+
+        for(Account a : item.getAccounts()) {
+            if(a.getAccountID() == accountid) {
+                return item;
+            }
+        }
+
+        throw new IllegalArgumentException(username + " Does not have this item");
+    }
+
+    private Item checkItemExistsInDb(int itemId){
+        Optional<Item> itemFromDb = _itemContext.findById(itemId);
+        if(!itemFromDb.isPresent()){
+            throw new IllegalArgumentException("Item with id: " + itemId  + " not found in the system");
+        }
+
+        return itemFromDb.get();
     }
 
     private void checkAccountContainsItems(Account account){
         if(account.getItems().isEmpty()){
-            throw new IllegalArgumentException("Account with id: " + String.valueOf(account.getId()) + " doesn't contain any items");
+            throw new IllegalArgumentException("Account with id: " + account.getAccountID() + " doesn't contain any items");
         }
     }
     //endregion

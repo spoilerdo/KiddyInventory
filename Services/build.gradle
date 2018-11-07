@@ -1,3 +1,13 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+    baseName = "com.kiddyinventory-services"
+    version = "1.0"
+}
+
 dependencies{
     testCompile("org.springframework.boot:spring-boot-starter-test")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")

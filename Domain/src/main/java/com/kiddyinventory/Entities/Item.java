@@ -34,6 +34,10 @@ public class Item extends ResourceSupport {
         this.price = price;
     }
 
+    public Set<Account> getAccounts() {
+        return accounts;
+    }
+
     public int getItemID() {
         return itemID;
     }

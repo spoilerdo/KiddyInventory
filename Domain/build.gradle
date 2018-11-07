@@ -1,8 +1,19 @@
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+    baseName = "com.kiddyinventory-domain"
+    version = "1.0"
+}
+
+
 dependencies {
     compile("org.springframework.boot:spring-boot-starter-test")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.springframework.boot:spring-boot-starter-hateoas")
-    compile 'com.fasterxml.jackson.core:jackson-core:2.9.4'
-    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.4'
-    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.4'
+    compile 'com.fasterxml.jackson.core:jackson-core:2.9.7'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.9.7'
+    compile 'com.fasterxml.jackson.core:jackson-annotations:2.9.7'
 }
