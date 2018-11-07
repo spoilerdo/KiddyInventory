@@ -4,8 +4,10 @@ import com.kiddyinventory.Entities.Account;
 import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.DataInterfaces.IAccountRepository;
 import com.kiddyinventory.DataInterfaces.IItemRepository;
+import com.kiddyinventory.Helper.RestCallHelper;
 import com.kiddyinventory.LogicInterface.IInventoryLogic;
-import org.assertj.core.util.Strings;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,12 +18,14 @@ import java.util.Optional;
 @Service
 public class InventoryLogic implements IInventoryLogic {
     private IItemRepository _itemContext;
+    private RestCallHelper restCallHelper;
     private IAccountRepository _accountContext;
 
     @Autowired
-    public InventoryLogic(IItemRepository itemContext, IAccountRepository accountContext){
+    public InventoryLogic(IItemRepository itemContext, IAccountRepository accountContext, RestCallHelper restCallHelper){
         this._itemContext = itemContext;
         this._accountContext = accountContext;
+        this.restCallHelper = restCallHelper;
     }
 
     @Override
@@ -125,16 +129,28 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     private boolean checkUserMatches(String username, int accountID) {
-        //TODO : MAKE CALL TO SERVER WITH USERNAME TO GET USER DATA
+        int foundAccountID = getAccountIDFromRestCall(username);
 
-        //TODO CHECK IF MATCHES
-        return false;
+        if(foundAccountID != accountID) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private int getAccountIDFromRestCall(String username) {
+        JSONObject account = restCallHelper.GetAccount(username);
+
+        try {
+            return account.getInt("id");
+        } catch(Exception e) {
+            return -1;
+        }
     }
 
     private Item checkAccountHasItem(String username, int itemID) {
         //TODO : MAKE CALL TO BANK API FOR USER DATA AND CHECK IF THE ACCOUNT ID MATCHES IN THE LIST OF GETACCOUNTS FROM ITEM
-        int accountid = 0;
-
+        int accountid = getAccountIDFromRestCall(username);
 
         Optional<Item> itemfromDb = _itemContext.findById(itemID);
         if(!itemfromDb.isPresent()){
