@@ -23,6 +23,10 @@ public class Account extends ResourceSupport {
 
     public Account() {}
 
+    public Account(int accountID) {
+        this.accountID = accountID;
+    }
+
     public int getAccountID() {
         return accountID;
     }

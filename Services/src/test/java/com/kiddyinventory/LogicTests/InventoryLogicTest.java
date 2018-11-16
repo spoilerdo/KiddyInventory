@@ -18,7 +18,7 @@ import java.security.Principal;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
-import static com.kiddyinventory.Constants.AuthConstants.*;
+import static com.kiddyinventory.Constants.APIConstants.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryLogicTest {
@@ -52,7 +52,7 @@ public class InventoryLogicTest {
 
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
 
         when(accountContext.findById(any(Integer.class))).thenReturn(Optional.ofNullable(dummyAccount));
         when(inventoryContext.findById(any(Integer.class))).thenReturn(Optional.of(dummyItem));
@@ -84,7 +84,7 @@ public class InventoryLogicTest {
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
         dummyItem.getAccounts().add(dummyAccount);
 
-        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
@@ -100,7 +100,7 @@ public class InventoryLogicTest {
         Account dummyAccount = new Account();
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
         exception.expect(IllegalArgumentException.class);
@@ -121,7 +121,7 @@ public class InventoryLogicTest {
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
@@ -137,7 +137,7 @@ public class InventoryLogicTest {
         String principalName = "name";
         Account dummyAccount = new Account();
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
@@ -155,7 +155,7 @@ public class InventoryLogicTest {
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
         dummyItem.getAccounts().add(dummyAccount);
 
-        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
@@ -173,7 +173,7 @@ public class InventoryLogicTest {
 
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
@@ -196,7 +196,7 @@ public class InventoryLogicTest {
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
@@ -212,7 +212,7 @@ public class InventoryLogicTest {
         String principalName = "name";
         Account dummyAccount = new Account();
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
         when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
@@ -234,8 +234,8 @@ public class InventoryLogicTest {
         dummy1Account.getItems().add(dummyItem);
         dummyItem.getAccounts().add(dummy1Account);
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
-        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
 
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
         when(accountContext.findById(dummy1Account.getAccountID())).thenReturn(Optional.ofNullable(dummy1Account));
@@ -257,8 +257,8 @@ public class InventoryLogicTest {
         Account dummy2Account = new Account();
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
-        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
 
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
@@ -277,8 +277,8 @@ public class InventoryLogicTest {
         Account dummy2Account = new Account();
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
-        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
 
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
 

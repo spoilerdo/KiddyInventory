@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 
-import static com.kiddyinventory.Constants.AuthConstants.*;
+import static com.kiddyinventory.Constants.APIConstants.*;
 
 @Service
 public class RestCallHelper {

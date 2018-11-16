@@ -13,7 +13,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kiddyinventory.Constants.AuthConstants.*;
+import static com.kiddyinventory.Constants.APIConstants.*;
 
 @Service
 public class InventoryLogic implements IInventoryLogic {
@@ -123,14 +123,14 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     private void checkUserMatches(String username, int accountID) {
-        int foundAccountID = restCallHelper.getCall(AUTHCALL + username, Account.class).getBody().getAccountID();
+        int foundAccountID = restCallHelper.getCall(GET_BANKACCOUNT + username, Account.class).getBody().getAccountID();
         if(foundAccountID != accountID){
             throw new IllegalArgumentException("Account does not have access to change other peoples data!");
         }
     }
 
     private int getAccountIDFromRestCall() {
-        return restCallHelper.getCall(AUTHCALL, Account.class).getBody().getAccountID();
+        return restCallHelper.getCall(GET_BANKACCOUNT, Account.class).getBody().getAccountID();
     }
 
     private Item checkAccountHasItem(String username, int itemID) {
