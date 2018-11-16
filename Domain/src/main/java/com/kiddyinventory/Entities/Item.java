@@ -15,7 +15,7 @@ public class Item extends ResourceSupport {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int itemID; //Ik denk dat item te veel redudantie is, ik gebruik liever id
+    private int itemID;
     private String name;
     private String description;
     private Condition condition;

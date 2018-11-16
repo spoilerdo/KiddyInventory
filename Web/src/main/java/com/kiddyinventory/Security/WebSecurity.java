@@ -15,7 +15,6 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
-import java.util.List;
 
 
 //https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/
@@ -38,10 +37,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtAuthorizationFilter(authenticationManager()))
-                // this disables session creation on Spring Security
+                //this disables session creation on Spring Security
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
-        //ROLE locken op url :  .antMatchers("/item/1").hasAuthority("ADMIN")
+        //TODO ROLE locken op url :  .antMatchers("/item/1").hasAuthority("ADMIN")
     }
 
     @Override
@@ -49,10 +48,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         auth.userDetailsService(userDetailsImpl).passwordEncoder(bCryptPasswordEncoder);
     }
 
-
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
-        final CorsConfiguration configuration = new CorsConfiguration();  configuration.setAllowedOrigins(Arrays.asList("*"));
+        final CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.asList("*")); //TODO: add all the APIs in our system??
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList("*"));

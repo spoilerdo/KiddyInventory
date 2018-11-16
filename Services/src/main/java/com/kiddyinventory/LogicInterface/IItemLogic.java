@@ -27,7 +27,7 @@ public interface IItemLogic {
      * @throws IllegalArgumentException if item values are empty
      * @throws IllegalArgumentException if item is not found in the system
      */
-    void updateItem(Item item);
+    Item updateItem(Item item);
     /**
      * get item with given parameter
      * @param itemID the id of the item you want to find

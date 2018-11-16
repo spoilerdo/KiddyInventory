@@ -28,8 +28,9 @@ public class ItemController {
     }
 
     @PutMapping(path = "/update")
-    public void updateItem(@RequestBody Item item) {
-        itemLogic.updateItem(item);
+    public ResponseEntity<Item> updateItem(@RequestBody Item item) {
+        Item updatedItem = itemLogic.updateItem(item);
+        return new ResponseEntity<>(updatedItem, HttpStatus.OK);
     }
 
     @DeleteMapping(path = "/delete/{id}")
@@ -44,7 +45,7 @@ public class ItemController {
         return new ResponseEntity<>(foundItem, HttpStatus.OK);
     }
 
-    @GetMapping(path = "")
+    @GetMapping(path = "/all")
     public ResponseEntity<Iterable<Item>> getAllItems() {
         Iterable<Item> items = itemLogic.getAllItems();
         return new ResponseEntity<>(items, HttpStatus.OK);

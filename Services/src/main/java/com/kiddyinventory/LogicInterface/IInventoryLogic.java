@@ -1,6 +1,5 @@
 package com.kiddyinventory.LogicInterface;
 
-import com.kiddyinventory.Entities.Account;
 import com.kiddyinventory.Entities.Item;
 
 import java.security.Principal;

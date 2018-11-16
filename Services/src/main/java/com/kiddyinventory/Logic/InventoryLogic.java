@@ -6,14 +6,14 @@ import com.kiddyinventory.DataInterfaces.IAccountRepository;
 import com.kiddyinventory.DataInterfaces.IItemRepository;
 import com.kiddyinventory.Helper.RestCallHelper;
 import com.kiddyinventory.LogicInterface.IInventoryLogic;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+
+import static com.kiddyinventory.Constants.AuthConstants.*;
 
 @Service
 public class InventoryLogic implements IInventoryLogic {
@@ -32,10 +32,8 @@ public class InventoryLogic implements IInventoryLogic {
     public void saveItem(Principal user , int accountID, int itemID) throws IllegalArgumentException {
         Item foundItem = checkItemExistsInDb(itemID);
 
-        //TODO check of principal matched met accountID
-        if(!checkUserMatches(user.getName(), accountID)) {
-            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
-        }
+        checkUserMatches(user.getName(), accountID);
+
         //check if user exists in de db
         Account foundAccount = checkUserExistsInDb(accountID);
 
@@ -53,9 +51,8 @@ public class InventoryLogic implements IInventoryLogic {
 
     @Override
     public List<Item> getItemsFromAccount(Principal user, int accountId) {
-        if(!checkUserMatches(user.getName(), accountId)) {
-            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
-        }
+        checkUserMatches(user.getName(), accountId);
+
         //check if the account exists in the database
         Account accountFromDb = checkUserExistsInDb(accountId);
 
@@ -77,9 +74,8 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public void deleteItemsFromAccount(Principal user, int accountId) {
         //check if he has access to make this call
-        if(!checkUserMatches(user.getName(), accountId)) {
-            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
-        }
+        checkUserMatches(user.getName(), accountId);
+
         //check if the account exists
         Account accountFromDb = checkUserExistsInDb(accountId);
 
@@ -95,9 +91,7 @@ public class InventoryLogic implements IInventoryLogic {
         //check if the item exists in the db
         Item itemFromDb = checkAccountHasItem(user.getName() ,itemID);
 
-        if(!checkUserMatches(user.getName(), senderId)) {
-            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
-        }
+        checkUserMatches(user.getName(), senderId);
 
         //check if sender account exists
         Account senderAccountFromDb = checkUserExistsInDb(senderId);
@@ -128,39 +122,29 @@ public class InventoryLogic implements IInventoryLogic {
         return accountFromDb.get();
     }
 
-    private boolean checkUserMatches(String username, int accountID) {
-        int foundAccountID = getAccountIDFromRestCall(username);
-
-        if(foundAccountID != accountID) {
-            return false;
+    private void checkUserMatches(String username, int accountID) {
+        int foundAccountID = restCallHelper.getCall(AUTHCALL + username, Account.class).getBody().getAccountID();
+        if(foundAccountID != accountID){
+            throw new IllegalArgumentException("Account does not have access to change other peoples data!");
         }
-
-        return true;
     }
 
-    private int getAccountIDFromRestCall(String username) {
-        JSONObject account = restCallHelper.GetAccount(username);
-
-        try {
-            return account.getInt("id");
-        } catch(Exception e) {
-            return -1;
-        }
+    private int getAccountIDFromRestCall() {
+        return restCallHelper.getCall(AUTHCALL, Account.class).getBody().getAccountID();
     }
 
     private Item checkAccountHasItem(String username, int itemID) {
-        //TODO : MAKE CALL TO BANK API FOR USER DATA AND CHECK IF THE ACCOUNT ID MATCHES IN THE LIST OF GETACCOUNTS FROM ITEM
-        int accountid = getAccountIDFromRestCall(username);
+        int accountId = getAccountIDFromRestCall();
 
-        Optional<Item> itemfromDb = _itemContext.findById(itemID);
-        if(!itemfromDb.isPresent()){
+        Optional<Item> itemFromDb = _itemContext.findById(itemID);
+        if(!itemFromDb.isPresent()){
             throw new IllegalArgumentException("Item with id: " +itemID + " not found in the system");
         }
 
-        Item item = itemfromDb.get();
+        Item item = itemFromDb.get();
 
         for(Account a : item.getAccounts()) {
-            if(a.getAccountID() == accountid) {
+            if(a.getAccountID() == accountId) {
                 return item;
             }
         }

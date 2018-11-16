@@ -27,35 +27,34 @@ public class ItemLogic implements IItemLogic {
         //check if all item values are not null
         CheckItemValuesNotEmpty(item);
 
-        Item createdItem = itemRepository.save(item);
-        return createdItem;
+        return itemRepository.save(item);
     }
 
     @Override
     public void deleteItem(int itemID) throws IllegalArgumentException{
         //check if the item exists in the db
-        Optional<Item> foundItem = CheckItemExistsInDb(itemID);
+        Item foundItem = CheckItemExistsInDb(itemID);
 
-        itemRepository.delete(foundItem.get());
+        itemRepository.delete(foundItem);
     }
 
     @Override
-    public void updateItem(Item item) throws IllegalArgumentException {
+    public Item updateItem(Item item) throws IllegalArgumentException {
         //check if all item values are not null
         CheckItemValuesNotEmpty(item);
 
         //check if the item exists in the db
         CheckItemExistsInDb(item.getItemID());
 
-        itemRepository.save(item);
+        return itemRepository.save(item);
     }
 
     @Override
     public Item getItem(int itemID) throws IllegalArgumentException {
         //check if the item exists in the db
-        Optional<Item> itemFromDb = CheckItemExistsInDb(itemID);
+        Item itemFromDb = CheckItemExistsInDb(itemID);
 
-        return itemFromDb.get();
+        return itemFromDb;
     }
 
     @Override
@@ -70,18 +69,18 @@ public class ItemLogic implements IItemLogic {
 
     //region Generic exception methods
     private void CheckItemValuesNotEmpty(Item item) {
-        if(Strings.isNullOrEmpty(item.getName()) || Strings.isNullOrEmpty(item.getDescription()) || item.getCondition() == null || item.getPrice() == null || item.getPrice() == 0){
+        if(Strings.isNullOrEmpty(item.getName()) || Strings.isNullOrEmpty(item.getDescription()) || item.getCondition() == null || item.getPrice() == null || item.getPrice() <= 0){
             throw new IllegalArgumentException("Values cannot be null");
         }
     }
 
-    private Optional<Item> CheckItemExistsInDb(int itemId) {
+    private Item CheckItemExistsInDb(int itemId) {
         Optional<Item> itemFromDb = itemRepository.findById(itemId);
         if(!itemFromDb.isPresent()) {
-            throw new IllegalArgumentException("Item with id : " + String.valueOf(itemId) + "not found");
+            throw new IllegalArgumentException("Item with id: " + itemId + " not found");
         }
 
-        return itemFromDb;
+        return itemFromDb.get();
     }
     //endregion
 }

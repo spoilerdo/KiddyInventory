@@ -7,18 +7,18 @@ import com.kiddyinventory.DataInterfaces.IItemRepository;
 import com.kiddyinventory.Enums.Condition;
 import com.kiddyinventory.Helper.RestCallHelper;
 import com.kiddyinventory.Logic.InventoryLogic;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.*;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.http.ResponseEntity;
 
 import java.security.Principal;
 import java.util.*;
 
 import static org.mockito.Mockito.*;
+import static com.kiddyinventory.Constants.AuthConstants.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class InventoryLogicTest {
@@ -27,14 +27,11 @@ public class InventoryLogicTest {
     @Rule
     public final ExpectedException exception = ExpectedException.none();
 
-    //constant dummyaccount jsonobject
-    private final JSONObject dummyJsonobject;
-
     //Mock repos
     @Mock
-    private IItemRepository inventoryRepository;
+    private IItemRepository inventoryContext;
     @Mock
-    private IAccountRepository accountRepository;
+    private IAccountRepository accountContext;
     @Mock
     private RestCallHelper restCallHelper;
 
@@ -47,41 +44,32 @@ public class InventoryLogicTest {
         MockitoAnnotations.initMocks(this);
     }
 
-    public InventoryLogicTest() {
-        this.dummyJsonobject = new JSONObject();
-        try {
-            dummyJsonobject.put("id", 0);
-        } catch (JSONException e) {
-
-        }
-    }
-
     @Test
     public void TestSaveItemValid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
-
+        String principalName = "name";
         Account dummyAccount = new Account();
 
-        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(accountRepository.findById(any(Integer.class))).thenReturn(Optional.ofNullable(dummyAccount));
-        when(inventoryRepository.findById(any(Integer.class))).thenReturn(Optional.of(dummyItem));
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
 
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
+        when(accountContext.findById(any(Integer.class))).thenReturn(Optional.ofNullable(dummyAccount));
+        when(inventoryContext.findById(any(Integer.class))).thenReturn(Optional.of(dummyItem));
 
-        _logic.saveItem(dummyPrincipal,dummyAccount.getAccountID(), 0);
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
-        verify(accountRepository, times(1)).save(dummyAccount);
+        _logic.saveItem(dummyPrincipal, dummyAccount.getAccountID(), dummyItem.getItemID());
+
+        verify(accountContext, times(1)).save(dummyAccount);
     }
 
     @Test
     public void TestSaveItemUnvalid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        Account dummyAccount = new Account();
-
-        when(inventoryRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
         exception.expect(IllegalArgumentException.class);
         _logic.saveItem(dummyPrincipal, 0, 0);
@@ -90,13 +78,16 @@ public class InventoryLogicTest {
     @Test
     public void TestGetItemValid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
+        String principalName = "name";
         Account dummyAccount = new Account();
-        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
+
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
         dummyItem.getAccounts().add(dummyAccount);
 
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         Item itemFromDb = _logic.getItem(dummyPrincipal, dummyItem.getItemID());
 
@@ -106,8 +97,11 @@ public class InventoryLogicTest {
     @Test
     public void TestGetItemUnvalid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
+        Account dummyAccount = new Account();
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(inventoryRepository.findById(any(Integer.class))).thenReturn(Optional.empty());
+        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
 
         exception.expect(IllegalArgumentException.class);
         _logic.getItem(dummyPrincipal, 0);
@@ -116,20 +110,21 @@ public class InventoryLogicTest {
     @Test
     public void TestGetItemsFromAccountValid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
-
+        String principalName = "name";
         Account dummyAccount = new Account();
 
-        Item dummy1Item = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
-        Item dummy2Item = new Item("test2item", "dit is een test item", Condition.FN, 10.50f);
+        Item dummy1Item = new Item("test1item", "test item", Condition.FN, 10.50f);
+        Item dummy2Item = new Item("test2item", "test item", Condition.FN, 10.50f);
 
         List<Item> dummyItems = new ArrayList<>();
         dummyItems.add(dummy1Item);
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         List<Item> itemsFromDb = _logic.getItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
 
@@ -139,11 +134,13 @@ public class InventoryLogicTest {
     @Test
     public void TestGetItemsFromAccountUnvalid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
+        String principalName = "name";
         Account dummyAccount = new Account();
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
         _logic.getItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
@@ -152,29 +149,34 @@ public class InventoryLogicTest {
     @Test
     public void TestDeleteItemValid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
-
+        String principalName = "name";
         Account dummyAccount = new Account();
 
-        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
         dummyItem.getAccounts().add(dummyAccount);
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         _logic.deleteItem(dummyPrincipal, dummyItem.getItemID());
 
-        verify(inventoryRepository, times(1)).delete(dummyItem);
+        verify(inventoryContext, times(1)).delete(dummyItem);
     }
 
     @Test
     public void TestDeleteItemUnvalid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
-        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
+        String principalName = "name";
+        Account dummyAccount = new Account();
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
+
+        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
         _logic.deleteItem(dummyPrincipal, dummyItem.getItemID());
@@ -183,35 +185,37 @@ public class InventoryLogicTest {
     @Test
     public void TestDeleteItemsFromAccountValid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
-
+        String principalName = "name";
         Account dummyAccount = new Account();
 
-        Item dummy1Item = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
-        Item dummy2Item = new Item("test2item", "dit is een test item", Condition.FN, 10.50f);
+        Item dummy1Item = new Item("dummy1Item", "test item", Condition.FN, 10.50f);
+        Item dummy2Item = new Item("dummy2Item", "test item", Condition.FN, 10.50f);
 
         List<Item> dummyItems = new ArrayList<>();
         dummyItems.add(dummy1Item);
         dummyItems.add(dummy2Item);
         dummyAccount.setItems(dummyItems);
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         _logic.deleteItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
 
-        verify(inventoryRepository, times(1)).deleteAll(dummyAccount.getItems());
+        verify(inventoryContext, times(1)).deleteAll(dummyAccount.getItems());
     }
 
     @Test
     public void TestDeleteItemsFromAccountUnvalid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
-
+        String principalName = "name";
         Account dummyAccount = new Account();
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(accountRepository.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
+        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
         _logic.deleteItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
@@ -220,35 +224,45 @@ public class InventoryLogicTest {
     @Test
     public void TestMoveItemValid(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
+        String principalName = "name";
 
         Account dummy1Account = new Account();
         Account dummy2Account = new Account();
         dummy2Account.setAccountID(1);
 
-        Item dummyItem = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
         dummy1Account.getItems().add(dummyItem);
         dummyItem.getAccounts().add(dummy1Account);
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
-        when(accountRepository.findById(dummy1Account.getAccountID())).thenReturn(Optional.ofNullable(dummy1Account));
-        when(accountRepository.findById(dummy2Account.getAccountID())).thenReturn(Optional.ofNullable(dummy2Account));
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+        when(accountContext.findById(dummy1Account.getAccountID())).thenReturn(Optional.ofNullable(dummy1Account));
+        when(accountContext.findById(dummy2Account.getAccountID())).thenReturn(Optional.ofNullable(dummy2Account));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         _logic.moveItem(dummyPrincipal,dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem.getItemID());
+
+        Assert.assertTrue(!dummy2Account.getItems().isEmpty());
     }
 
     @Test
     public void TestMoveItemNotInDb(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
+        String principalName = "name";
 
         Account dummy1Account = new Account();
         Account dummy2Account = new Account();
-        Item dummyItem = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
         _logic.moveItem(dummyPrincipal, dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem.getItemID());
@@ -257,14 +271,18 @@ public class InventoryLogicTest {
     @Test
     public void TestMoveItemSenderDoesntContainItem(){
         Principal dummyPrincipal = Mockito.mock(Principal.class);
+        String principalName = "name";
 
         Account dummy1Account = new Account();
         Account dummy2Account = new Account();
-        Item dummyItem = new Item("test1item", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(restCallHelper.GetAccount(any(String.class))).thenReturn(dummyJsonobject);
-        when(dummyPrincipal.getName()).thenReturn("mooienaam");
-        when(inventoryRepository.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+        when(restCallHelper.getCall(AUTHCALL + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+        when(restCallHelper.getCall(AUTHCALL, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
+
+        when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
+
+        when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
         _logic.moveItem(dummyPrincipal, dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem.getItemID());

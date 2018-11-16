@@ -4,7 +4,6 @@ import com.kiddyinventory.DataInterfaces.IItemRepository;
 import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.Enums.Condition;
 import com.kiddyinventory.Logic.ItemLogic;
-import com.kiddyinventory.LogicInterface.IItemLogic;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
@@ -36,7 +35,7 @@ public class ItemLogicTest {
     private IItemRepository itemRepository;
 
     @InjectMocks
-    private ItemLogic itemLogic;
+    private ItemLogic _logic;
 
     @Before //sets up the mock
     public void setUp(){
@@ -45,15 +44,15 @@ public class ItemLogicTest {
 
     @Test
     public void testCreateItemValid() {
-        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
         when(itemRepository.save(dummyItem)).thenReturn(dummyItem);
 
-        Item returnedItem = itemLogic.createItem(dummyItem);
+        Item returnedItem = _logic.createItem(dummyItem);
 
         //Check if the right item is returned
         Assert.assertEquals(dummyItem, returnedItem);
-        //Check if the sace function is called in the repo
+        //Check if the save function is called in the repo
         verify(itemRepository, times(1)).save(dummyItem);
     }
 
@@ -63,16 +62,16 @@ public class ItemLogicTest {
 
         exception.expect(IllegalArgumentException.class);
 
-        itemLogic.createItem(dummyItem);
+        _logic.createItem(dummyItem);
     }
 
     @Test
     public void testDeleteItemValid() {
-        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
         when(itemRepository.findById(anyInt())).thenReturn(Optional.of(dummyItem));
 
-        itemLogic.deleteItem(1);
+        _logic.deleteItem(dummyItem.getItemID());
 
         verify(itemRepository, times(1)).delete(dummyItem);
     }
@@ -83,48 +82,49 @@ public class ItemLogicTest {
 
         exception.expect(IllegalArgumentException.class);
 
-        itemLogic.deleteItem(1);
+        _logic.deleteItem(1);
     }
 
     @Test
     public void testUpdateItemValid() {
-        Item oldItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
-        Item newItem = new Item("testitemnieuw","dit is een test item", Condition.FN, 10.50f);
+        Item oldItem = new Item("dummyOldItem", "test item", Condition.FN, 10.50f);
+        Item newItem = new Item("dummyNewItem","test item", Condition.FN, 10.50f);
 
-        when(itemRepository.findById(anyInt())).thenReturn(Optional.of(oldItem));
+        when(itemRepository.findById(oldItem.getItemID())).thenReturn(Optional.of(oldItem));
 
-        itemLogic.updateItem(newItem);
+        _logic.updateItem(newItem);
 
         verify(itemRepository, times(1)).save(newItem);
-
     }
 
     @Test
     public void testUpdateItemInvalid() {
-        Item newItem = new Item("testitemnieuw","dit is een test item", Condition.FN, 10.50f);
+        Item newItem = new Item("dummyNewItem","test item", Condition.FN, 10.50f);
 
-        when(itemRepository.findById(anyInt())).thenReturn(Optional.empty());
+        when(itemRepository.findById(newItem.getItemID())).thenReturn(Optional.empty());
+
         exception.expect(IllegalArgumentException.class);
-
-        itemLogic.updateItem(newItem);
+        _logic.updateItem(newItem);
     }
 
     @Test
     public void testGetItemExists() {
-        Item dummyItem = new Item("testitem", "dit is een test item", Condition.FN, 10.50f);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        when(itemRepository.findById(anyInt())).thenReturn(Optional.of(dummyItem));
+        when(itemRepository.findById(dummyItem.getItemID())).thenReturn(Optional.of(dummyItem));
 
-        Assert.assertEquals(dummyItem, itemLogic.getItem(1));
-        verify(itemRepository, times(1)).findById(1);
+        Assert.assertEquals(dummyItem, _logic.getItem(dummyItem.getItemID()));
+        verify(itemRepository, times(1)).findById(dummyItem.getItemID());
     }
 
     @Test
     public void testGetItemDoesNotExist() {
-        when(itemRepository.findById(anyInt())).thenReturn(Optional.empty());
-        exception.expect(IllegalArgumentException.class);
+        Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
 
-        itemLogic.getItem(1);
+        when(itemRepository.findById(dummyItem.getItemID())).thenReturn(Optional.empty());
+
+        exception.expect(IllegalArgumentException.class);
+        _logic.getItem(dummyItem.getItemID());
     }
 
 }
