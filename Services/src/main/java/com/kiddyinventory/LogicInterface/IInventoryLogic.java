@@ -10,11 +10,11 @@ public interface IInventoryLogic {
      * @param user the claim of the logged in user taken from JWT
      * @param accountID the id of the account to save the item to
      * @param itemID the id of the item you want to save
-     * @return nothing if everything goes correct
+     * @return the saved item
      * @throws IllegalArgumentException if item values are empty
      * @throws IllegalArgumentException if account doesn't exists in the db
      */
-    void saveItem(Principal user , int accountID , int itemID);
+    Item saveItem(Principal user , int accountID , int itemID);
 
     /**
      * @param user the claim of the logged in user

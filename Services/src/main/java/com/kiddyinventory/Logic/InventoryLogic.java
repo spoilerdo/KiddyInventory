@@ -29,7 +29,7 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     @Override
-    public void saveItem(Principal user , int accountID, int itemID) throws IllegalArgumentException {
+    public Item saveItem(Principal user , int accountID, int itemID) throws IllegalArgumentException {
         Item foundItem = checkItemExistsInDb(itemID);
 
         checkUserMatches(user.getName(), accountID);
@@ -41,6 +41,8 @@ public class InventoryLogic implements IInventoryLogic {
         foundItem.getAccounts().add(foundAccount);
 
         _accountContext.save(foundAccount);
+
+        return foundItem;
     }
 
     @Override
