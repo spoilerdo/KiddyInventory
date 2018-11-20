@@ -30,7 +30,7 @@ public class AccountLogic implements IAccountLogic {
         //check if the bankAccount already has a Inventory account
         Optional<Account> account = accountContext.findById(bankAccountId);
         if(account.isPresent()){
-            throw new IllegalArgumentException("account with id: " + account.get().getAccountID() + " already exists in the system");
+            throw new IllegalArgumentException("account with id: " + account.get().getId() + " already exists in the system");
         }
 
         //create an inventory account
@@ -47,5 +47,19 @@ public class AccountLogic implements IAccountLogic {
 
         //delete account
         accountContext.delete(accountFromDb.get());
+    }
+
+    @Override
+    public Account createAccountTest() {
+        //get account associated with token from authentication server
+        int bankAccountID = restCall.getCall(GET_BANKACCOUNT, Account.class).getBody().getId();
+
+        //create inventory account for given bank account if it does not exist yet.
+        Optional<Account> account = accountContext.findById(bankAccountID);
+        if(account.isPresent()){
+            throw new IllegalArgumentException("account with id: " + bankAccountID + " already exists in the system");
+        }
+
+        return accountContext.save(new Account(bankAccountID));
     }
 }

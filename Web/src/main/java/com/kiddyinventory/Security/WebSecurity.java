@@ -20,14 +20,6 @@ import java.util.Arrays;
 //https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
-    private UserDetailsService userDetailsImpl;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    public WebSecurity(@Qualifier("authLogic") UserDetailsService userDetailsImpl) {
-        this.userDetailsImpl = userDetailsImpl;
-        this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -41,11 +33,6 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         //TODO ROLE locken op url :  .antMatchers("/item/1").hasAuthority("ADMIN")
-    }
-
-    @Override
-    public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsImpl).passwordEncoder(bCryptPasswordEncoder);
     }
 
     @Bean

@@ -1,7 +1,6 @@
 package com.kiddyinventory.Entities;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.springframework.hateoas.ResourceSupport;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -9,9 +8,9 @@ import java.util.List;
 
 @Entity
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
-public class Account extends ResourceSupport {
+public class Account {
     @Id
-    private int accountID;
+    private int id;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -23,16 +22,16 @@ public class Account extends ResourceSupport {
 
     public Account() {}
 
-    public Account(int accountID) {
-        this.accountID = accountID;
+    public Account(int id) {
+        this.id = id;
     }
 
-    public int getAccountID() {
-        return accountID;
+    public int getId() {
+        return id;
     }
 
-    public void setAccountID(int accountID) {
-        this.accountID = accountID;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public List<Item> getItems() {

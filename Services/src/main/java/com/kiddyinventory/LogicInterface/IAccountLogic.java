@@ -18,4 +18,6 @@ public interface IAccountLogic {
      * @throws IllegalArgumentException if account was not found
      */
     void deleteAccount(int accountId);
+
+    Account createAccountTest();
 }

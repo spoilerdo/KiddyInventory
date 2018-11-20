@@ -59,7 +59,7 @@ public class InventoryLogicTest {
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
-        _logic.saveItem(dummyPrincipal, dummyAccount.getAccountID(), dummyItem.getItemID());
+        _logic.saveItem(dummyPrincipal, dummyAccount.getId(), dummyItem.getItemID());
 
         verify(accountContext, times(1)).save(dummyAccount);
     }
@@ -122,11 +122,11 @@ public class InventoryLogicTest {
         dummyAccount.setItems(dummyItems);
 
         when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
-        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountContext.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
-        List<Item> itemsFromDb = _logic.getItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
+        List<Item> itemsFromDb = _logic.getItemsFromAccount(dummyPrincipal, dummyAccount.getId());
 
         Assert.assertEquals(dummyItems, itemsFromDb);
     }
@@ -138,12 +138,12 @@ public class InventoryLogicTest {
         Account dummyAccount = new Account();
 
         when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
-        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountContext.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
-        _logic.getItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
+        _logic.getItemsFromAccount(dummyPrincipal, dummyAccount.getId());
     }
 
     @Test
@@ -197,11 +197,11 @@ public class InventoryLogicTest {
         dummyAccount.setItems(dummyItems);
 
         when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
-        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountContext.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
-        _logic.deleteItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
+        _logic.deleteItemsFromAccount(dummyPrincipal, dummyAccount.getId());
 
         verify(inventoryContext, times(1)).deleteAll(dummyAccount.getItems());
     }
@@ -213,12 +213,12 @@ public class InventoryLogicTest {
         Account dummyAccount = new Account();
 
         when(restCallHelper.getCall(GET_BANKACCOUNT + principalName, Account.class)).thenReturn(ResponseEntity.ok(dummyAccount));
-        when(accountContext.findById(dummyAccount.getAccountID())).thenReturn(Optional.ofNullable(dummyAccount));
+        when(accountContext.findById(dummyAccount.getId())).thenReturn(Optional.ofNullable(dummyAccount));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
-        _logic.deleteItemsFromAccount(dummyPrincipal, dummyAccount.getAccountID());
+        _logic.deleteItemsFromAccount(dummyPrincipal, dummyAccount.getId());
     }
 
     @Test
@@ -228,7 +228,7 @@ public class InventoryLogicTest {
 
         Account dummy1Account = new Account();
         Account dummy2Account = new Account();
-        dummy2Account.setAccountID(1);
+        dummy2Account.setId(1);
 
         Item dummyItem = new Item("dummyItem", "test item", Condition.FN, 10.50f);
         dummy1Account.getItems().add(dummyItem);
@@ -238,12 +238,12 @@ public class InventoryLogicTest {
         when(restCallHelper.getCall(GET_BANKACCOUNT, Account.class)).thenReturn(ResponseEntity.ok(dummy1Account));
 
         when(inventoryContext.findById(dummyItem.getItemID())).thenReturn(Optional.ofNullable(dummyItem));
-        when(accountContext.findById(dummy1Account.getAccountID())).thenReturn(Optional.ofNullable(dummy1Account));
-        when(accountContext.findById(dummy2Account.getAccountID())).thenReturn(Optional.ofNullable(dummy2Account));
+        when(accountContext.findById(dummy1Account.getId())).thenReturn(Optional.ofNullable(dummy1Account));
+        when(accountContext.findById(dummy2Account.getId())).thenReturn(Optional.ofNullable(dummy2Account));
 
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
-        _logic.moveItem(dummyPrincipal,dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem.getItemID());
+        _logic.moveItem(dummyPrincipal,dummy1Account.getId(), dummy2Account.getId(), dummyItem.getItemID());
 
         Assert.assertTrue(!dummy2Account.getItems().isEmpty());
     }
@@ -265,7 +265,7 @@ public class InventoryLogicTest {
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
-        _logic.moveItem(dummyPrincipal, dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem.getItemID());
+        _logic.moveItem(dummyPrincipal, dummy1Account.getId(), dummy2Account.getId(), dummyItem.getItemID());
     }
 
     @Test
@@ -285,6 +285,6 @@ public class InventoryLogicTest {
         when(dummyPrincipal.getName()).thenReturn(principalName);
 
         exception.expect(IllegalArgumentException.class);
-        _logic.moveItem(dummyPrincipal, dummy1Account.getAccountID(), dummy2Account.getAccountID(), dummyItem.getItemID());
+        _logic.moveItem(dummyPrincipal, dummy1Account.getId(), dummy2Account.getId(), dummyItem.getItemID());
     }
 }

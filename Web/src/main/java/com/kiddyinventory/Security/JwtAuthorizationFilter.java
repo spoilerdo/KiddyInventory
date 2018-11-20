@@ -9,6 +9,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
+
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -45,22 +46,24 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     }
 
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
-        String token = request.getHeader(HEADER_STRING);
-        if (token != null) {
-            // parse the token.
-            Claims userClaim =  Jwts.parser().setSigningKey(JWTKEY).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
+            String token = request.getHeader(HEADER_STRING);
+            if (token != null) {
+                // make call to bank to
 
-            //retrieve roles from JWT token and convert to grantedauthority
-            List<String> scopes = (List<String>) userClaim.get("scopes");
-            List<GrantedAuthority> authorities = scopes.stream()
-                    .map(authority -> new SimpleGrantedAuthority(authority))
-                    .collect(Collectors.toList());
+                // parse the token.
+                Claims userClaim =  Jwts.parser().setSigningKey(JWTKEY).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
 
-            if (userClaim.getSubject() != null) {
-                return new UsernamePasswordAuthenticationToken(userClaim.getSubject(), null, authorities);
+                //retrieve roles from JWT token and convert to grantedauthority
+                List<String> scopes = (List<String>) userClaim.get("scopes");
+                List<GrantedAuthority> authorities = scopes.stream()
+                        .map(authority -> new SimpleGrantedAuthority(authority))
+                        .collect(Collectors.toList());
+
+                if (userClaim.getSubject() != null) {
+                    return new UsernamePasswordAuthenticationToken(userClaim.getSubject(), null, authorities);
+                }
+                return null;
             }
             return null;
-        }
-        return null;
     }
 }
