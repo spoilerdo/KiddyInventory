@@ -37,7 +37,7 @@ public class AuthLogic implements UserDetailsService {
         //fetch account from authorization server
         JSONObject account = retrieveAccountData(username);
 
-        //Get optional values from json object
+        //get optional values from json object
         int accountID = account.optInt("id");
         String accountName = account.optString("username");
         String password = account.optString("password");
@@ -49,7 +49,7 @@ public class AuthLogic implements UserDetailsService {
 
         Optional<Account> foundAccount = accountRepository.findById(accountID);
 
-        //check if user has logged in to our gambling service before, if not create new account for them
+        //check if user has logged in to our inventory API before, if not create new account
         if (!foundAccount.isPresent()) {
             Account newAccount = new Account();
             newAccount.setId(accountID);
