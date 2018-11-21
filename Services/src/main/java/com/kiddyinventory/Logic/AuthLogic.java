@@ -2,7 +2,8 @@ package com.kiddyinventory.Logic;
 
 import com.kiddyinventory.DataInterfaces.IAccountRepository;
 import com.kiddyinventory.Entities.Account;
-import net.minidev.json.JSONValue;
+
+import org.assertj.core.util.Strings;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,31 +16,56 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.util.Optional;
 
+import static com.kiddyinventory.Constants.APIConstants.GET_BANKACCOUNT;
 import static java.util.Collections.emptyList;
 
 @Service
 public class AuthLogic implements UserDetailsService {
     private HttpServletRequest request;
-    private IAccountRepository accountContext;
+    private IAccountRepository accountRepository;
 
     @Autowired
-    public AuthLogic(HttpServletRequest request, IAccountRepository accountContext) {
+    public AuthLogic(HttpServletRequest request, IAccountRepository context) {
         this.request = request;
-        this.accountContext = accountContext;
+        this.accountRepository = context;
     }
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        //fetch account from authorization server
+        JSONObject account = retrieveAccountData(username);
+
+        //Get optional values from json object
+        int accountID = account.optInt("id");
+        String accountName = account.optString("username");
+        String password = account.optString("password");
+
+        //check if values are indeed present
+        if(accountID == 0 || Strings.isNullOrEmpty(accountName)) {
+            throw new UsernameNotFoundException("Something went wrong, please contact support");
+        }
+
+        Optional<Account> foundAccount = accountRepository.findById(accountID);
+
+        //check if user has logged in to our gambling service before, if not create new account for them
+        if (!foundAccount.isPresent()) {
+            Account newAccount = new Account();
+            newAccount.setId(accountID);
+            accountRepository.save(newAccount);
+        }
+        return new User(accountName, password, emptyList());
+    }
+
+    private JSONObject retrieveAccountData(String username) {
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", request.getHeader("Authorization"));
 
         HttpEntity<?> httpEntity = new HttpEntity<>("" , headers);
 
-        RestTemplate restcall = new RestTemplate();
-        ResponseEntity<String> response = restcall.exchange("localhost:8888/account/" + username, HttpMethod.GET, httpEntity, String.class);
+        RestTemplate restTemplate = new RestTemplate();
+        ResponseEntity<String> response = restTemplate.exchange(GET_BANKACCOUNT + username, HttpMethod.GET, httpEntity, String.class);
 
         //check if status code is correct
         if(response.getStatusCode() != HttpStatus.OK) {
@@ -47,25 +73,15 @@ public class AuthLogic implements UserDetailsService {
         }
 
         //convert to json
-        JSONObject account = (JSONObject)JSONValue.parse(response.getBody());
-
-        if (account == null) {
-            throw new UsernameNotFoundException(username);
-        }
-
         try {
-            //Save user to inventory database if he does not exist in it yet
-            int accountID = account.getInt("id");
-            Optional<Account> foundAccount = accountContext.findById(accountID);
+            JSONObject account = new JSONObject(response.getBody());
 
-            if(!foundAccount.isPresent()) {
-                Account newAccount = new Account();
-                newAccount.setAccountID(accountID);
-                accountContext.save(newAccount);
+            if (account == null) {
+                throw new UsernameNotFoundException(username);
             }
 
-            User foundUser = new User(account.getString("username"), account.getString("password"), emptyList());
-            return foundUser;
+            return account;
+
         } catch(JSONException e) {
             throw new UsernameNotFoundException(username);
         }

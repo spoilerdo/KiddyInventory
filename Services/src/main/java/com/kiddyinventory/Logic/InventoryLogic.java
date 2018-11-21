@@ -6,6 +6,7 @@ import com.kiddyinventory.DataInterfaces.IAccountRepository;
 import com.kiddyinventory.DataInterfaces.IItemRepository;
 import com.kiddyinventory.Helper.RestCallHelper;
 import com.kiddyinventory.LogicInterface.IInventoryLogic;
+import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -125,14 +126,15 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     private void checkUserMatches(String username, int accountID) {
-        int foundAccountID = restCallHelper.getCall(GET_BANKACCOUNT + username, Account.class).getBody().getAccountID();
+        //JsonObject instead of account class because return name of id is 'id' and not 'accountid', we cant use 'id' here because of our entities extending resourcesupport for rest level 3.
+        int foundAccountID = restCallHelper.getCall(GET_BANKACCOUNT + username, Account.class).getBody().getId();
         if(foundAccountID != accountID){
             throw new IllegalArgumentException("Account does not have access to change other peoples data!");
         }
     }
 
     private int getAccountIDFromRestCall() {
-        return restCallHelper.getCall(GET_BANKACCOUNT, Account.class).getBody().getAccountID();
+        return restCallHelper.getCall(GET_BANKACCOUNT, Account.class).getBody().getId();
     }
 
     private Item checkAccountHasItem(String username, int itemID) {
@@ -146,7 +148,7 @@ public class InventoryLogic implements IInventoryLogic {
         Item item = itemFromDb.get();
 
         for(Account a : item.getAccounts()) {
-            if(a.getAccountID() == accountId) {
+            if(a.getId() == accountId) {
                 return item;
             }
         }
@@ -165,7 +167,7 @@ public class InventoryLogic implements IInventoryLogic {
 
     private void checkAccountContainsItems(Account account){
         if(account.getItems().isEmpty()){
-            throw new IllegalArgumentException("Account with id: " + account.getAccountID() + " doesn't contain any items");
+            throw new IllegalArgumentException("Account with id: " + account.getId() + " doesn't contain any items");
         }
     }
     //endregion
