@@ -43,7 +43,7 @@ public class AuthLogic implements UserDetailsService {
         String password = account.optString("password");
 
         //check if values are indeed present
-        if(accountID == 0 || Strings.isNullOrEmpty(accountName)) {
+        if(accountID == 0 || Strings.isNullOrEmpty(accountName) || Strings.isNullOrEmpty(password)) {
             throw new UsernameNotFoundException("Something went wrong, please contact support");
         }
 
