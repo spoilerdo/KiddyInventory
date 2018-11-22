@@ -4,9 +4,7 @@ import com.kiddyinventory.Entities.Account;
 import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.DataInterfaces.IAccountRepository;
 import com.kiddyinventory.DataInterfaces.IItemRepository;
-import com.kiddyinventory.Helper.RestCallHelper;
 import com.kiddyinventory.LogicInterface.IInventoryLogic;
-import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,19 +12,15 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
 
-import static com.kiddyinventory.Constants.APIConstants.*;
-
 @Service
 public class InventoryLogic implements IInventoryLogic {
     private IItemRepository _itemContext;
-    private RestCallHelper restCallHelper;
     private IAccountRepository _accountContext;
 
     @Autowired
-    public InventoryLogic(IItemRepository itemContext, IAccountRepository accountContext, RestCallHelper restCallHelper){
+    public InventoryLogic(IItemRepository itemContext, IAccountRepository accountContext){
         this._itemContext = itemContext;
         this._accountContext = accountContext;
-        this.restCallHelper = restCallHelper;
     }
 
     @Override
@@ -116,6 +110,7 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     //region Generic exception methods
+
     private Account checkUserExistsInDb(int accountId){
         Optional<Account> accountFromDb = _accountContext.findById(accountId);
         if(!accountFromDb.isPresent()){
@@ -126,19 +121,19 @@ public class InventoryLogic implements IInventoryLogic {
     }
 
     private void checkUserMatches(String username, int accountID) {
-        //JsonObject instead of account class because return name of id is 'id' and not 'accountid', we cant use 'id' here because of our entities extending resourcesupport for rest level 3.
-        int foundAccountID = restCallHelper.getCall(GET_BANKACCOUNT + username, Account.class).getBody().getId();
-        if(foundAccountID != accountID){
+        //get account ID from inventory db
+        Optional<Account> foundAccount = _accountContext.findByUsername(username);
+        if(!foundAccount.isPresent()){
+            throw new IllegalArgumentException("Account with username: " + username + "doesn't exist");
+        }
+        if(foundAccount.get().getId() != accountID){
             throw new IllegalArgumentException("Account does not have access to change other peoples data!");
         }
     }
 
-    private int getAccountIDFromRestCall() {
-        return restCallHelper.getCall(GET_BANKACCOUNT, Account.class).getBody().getId();
-    }
-
     private Item checkAccountHasItem(String username, int itemID) {
-        int accountId = getAccountIDFromRestCall();
+        //get account ID from inventory db
+        int foundAccountId = _accountContext.findByUsername(username).get().getId();
 
         Optional<Item> itemFromDb = _itemContext.findById(itemID);
         if(!itemFromDb.isPresent()){
@@ -148,7 +143,7 @@ public class InventoryLogic implements IInventoryLogic {
         Item item = itemFromDb.get();
 
         for(Account a : item.getAccounts()) {
-            if(a.getId() == accountId) {
+            if(a.getId() == foundAccountId) {
                 return item;
             }
         }
@@ -170,5 +165,6 @@ public class InventoryLogic implements IInventoryLogic {
             throw new IllegalArgumentException("Account with id: " + account.getId() + " doesn't contain any items");
         }
     }
+
     //endregion
 }

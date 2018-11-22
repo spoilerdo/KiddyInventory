@@ -11,6 +11,7 @@ import java.util.List;
 public class Account {
     @Id
     private int id;
+    private String username;
 
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(
@@ -22,8 +23,13 @@ public class Account {
 
     public Account() {}
 
-    public Account(int id) {
+    public Account(int id, String username) {
         this.id = id;
+        this.username = username;
+    }
+
+    public Account(String username) {
+        this.username = username;
     }
 
     public int getId() {
@@ -40,5 +46,9 @@ public class Account {
 
     public void setItems(List<Item> items) {
         this.items = items;
+    }
+
+    public String getUsername() {
+        return username;
     }
 }

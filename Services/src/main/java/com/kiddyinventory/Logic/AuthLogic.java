@@ -51,8 +51,7 @@ public class AuthLogic implements UserDetailsService {
 
         //check if user has logged in to our inventory API before, if not create new account
         if (!foundAccount.isPresent()) {
-            Account newAccount = new Account();
-            newAccount.setId(accountID);
+            Account newAccount = new Account(accountID, accountName);
             accountRepository.save(newAccount);
         }
         return new User(accountName, password, emptyList());
