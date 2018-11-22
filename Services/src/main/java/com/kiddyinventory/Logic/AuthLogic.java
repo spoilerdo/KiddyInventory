@@ -18,6 +18,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Optional;
 
+import static com.kiddyinventory.Constants.APIConstants.AUTHHEADER;
 import static com.kiddyinventory.Constants.APIConstants.GET_BANKACCOUNT;
 import static java.util.Collections.emptyList;
 
@@ -59,7 +60,7 @@ public class AuthLogic implements UserDetailsService {
 
     private JSONObject retrieveAccountData(String username) {
         HttpHeaders headers = new HttpHeaders();
-        headers.set("Authorization", request.getHeader("Authorization"));
+        headers.set(AUTHHEADER, request.getHeader(AUTHHEADER));
 
         HttpEntity<?> httpEntity = new HttpEntity<>("" , headers);
 
