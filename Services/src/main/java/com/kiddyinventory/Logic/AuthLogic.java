@@ -35,7 +35,7 @@ public class AuthLogic implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         //fetch account from authorization server
-        JSONObject account = retrieveAccountData(username);
+            JSONObject account = retrieveAccountData(username);
 
         //Get optional values from json object
         int accountID = account.optInt("id");
