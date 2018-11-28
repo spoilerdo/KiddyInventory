@@ -1,6 +1,6 @@
 package com.kiddyinventory.Wrapper;
 
-public class TransactionResponse {
+public class TransactionWrapper {
     int senderId;
     int receiverId;
     int itemId;

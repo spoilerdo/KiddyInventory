@@ -16,17 +16,14 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.Arrays;
 
-
 //https://auth0.com/blog/implementing-jwt-authentication-on-spring-boot/
 @EnableWebSecurity
 public class WebSecurity extends WebSecurityConfigurerAdapter {
-    private UserDetailsService userDetailsImpl;
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private JwtAuthenticationProvider authenticationProvider;
 
     @Autowired
     public WebSecurity(@Qualifier("authLogic") UserDetailsService userDetailsImpl) {
-        this.userDetailsImpl = userDetailsImpl;
-        this.bCryptPasswordEncoder = new BCryptPasswordEncoder();
+        this.authenticationProvider = new JwtAuthenticationProvider(userDetailsImpl);
     }
 
     @Override
@@ -46,7 +43,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
 
     @Override
     public void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsImpl).passwordEncoder(bCryptPasswordEncoder);
+        auth.authenticationProvider(authenticationProvider);
     }
 
     @Bean

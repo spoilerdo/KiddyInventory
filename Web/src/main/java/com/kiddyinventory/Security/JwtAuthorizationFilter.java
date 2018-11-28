@@ -48,8 +48,6 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     private UsernamePasswordAuthenticationToken getAuthentication(HttpServletRequest request) {
             String token = request.getHeader(HEADER_STRING);
             if (token != null) {
-                // make call to bank to
-
                 // parse the token.
                 Claims userClaim =  Jwts.parser().setSigningKey(JWTKEY).parseClaimsJws(token.replace(TOKEN_PREFIX, "")).getBody();
 
