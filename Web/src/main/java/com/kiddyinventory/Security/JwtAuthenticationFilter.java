@@ -1,8 +1,7 @@
 package com.kiddyinventory.Security;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.kiddyinventory.Wrapper.loginWrapper;
+import com.kiddyinventory.Wrapper.LoginWrapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -37,8 +36,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public Authentication attemptAuthentication(HttpServletRequest req,
                                                 HttpServletResponse res) throws AuthenticationException {
         try{
-            loginWrapper creds = new ObjectMapper()
-                    .readValue(req.getInputStream(), loginWrapper.class);
+            LoginWrapper creds = new ObjectMapper()
+                    .readValue(req.getInputStream(), LoginWrapper.class);
 
             return authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -60,8 +59,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Date expirationDate = Date.valueOf(LocalDate.now().plusDays(1));
         Date currentDate = Date.valueOf(LocalDate.now());
 
-        //get username and make a claim with roles
+        //get username, id and make a claim with roles
         String subject = ((User)auth.getPrincipal()).getUsername();
+        //String id = ((User)auth.getPrincipal().)
         Claims claim = Jwts.claims().setSubject(subject);
         claim.put("scopes", auth.getAuthorities().stream().map(s -> s.toString()).collect(Collectors.toList()));
 
@@ -74,6 +74,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                 .signWith(SignatureAlgorithm.HS512, JWTKEY)
                 .compact();
 
+        //TODO: maybe use gson??
         //Convert token to json and return to the user
         JSONObject tokenResponse = new JSONObject();
         try {

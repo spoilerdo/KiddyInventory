@@ -2,8 +2,8 @@ package com.kiddyinventory.Controller;
 
 import com.kiddyinventory.Entities.Item;
 import com.kiddyinventory.LogicInterface.IInventoryLogic;
-import com.kiddyinventory.Wrapper.TransactionResponse;
-import com.kiddyinventory.Wrapper.itemRequestModel;
+import com.kiddyinventory.Wrapper.TransactionWrapper;
+import com.kiddyinventory.Wrapper.ItemRequestWrapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,16 +24,16 @@ public class InventoryController {
     }
 
     @PostMapping(path = "")
-    public ResponseEntity<Item> addItemToInventory(Principal user, itemRequestModel itemRequestModel) {
-        return new ResponseEntity<>(this.inventoryLogic.saveItem(user, itemRequestModel.getAccountID(), itemRequestModel.getItemID()), HttpStatus.OK);
+    public ResponseEntity<Item> addItemToInventory(Principal user, ItemRequestWrapper itemRequestWrapper) {
+        return new ResponseEntity<>(this.inventoryLogic.saveItem(user, itemRequestWrapper.getAccountID(), itemRequestWrapper.getItemID()), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/{id}")
     public void deleteItemFromInventory(Principal user, @PathVariable("id") int itemID) {
         this.inventoryLogic.deleteItem(user, itemID);
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<List<Item>> GetAllItemsFromInventory(Principal user, @PathVariable("id") int accountID) {
         return new ResponseEntity<>(this.inventoryLogic.getItemsFromAccount(user, accountID), HttpStatus.OK);
     }
@@ -44,7 +44,7 @@ public class InventoryController {
     }
 
     @PostMapping(path = "/transfer")
-    public void MoveItem(Principal user, @RequestBody TransactionResponse response){
+    public void MoveItem(Principal user, @RequestBody TransactionWrapper response){
         this.inventoryLogic.moveItem(user, response.getSenderId(), response.getReceiverId(), response.getItemId());
     }
 }

@@ -19,14 +19,11 @@ public class AccountLogic implements IAccountLogic {
     }
 
     @Override
-    public Account getAccount(int accountID) {
-        Optional<Account> foundAccount = accountRepository.findById(accountID);
+    public Account getAccount(int accountId) {
+        //check if account with given accountId exists in the system
+        Account foundAccount = checkAccountExistsInDb(accountId);
 
-        if(!foundAccount.isPresent()) {
-            throw new IllegalArgumentException("Account with id : " + accountID + " Not found");
-        }
-
-        return foundAccount.get();
+        return foundAccount;
     }
 
     @Override
@@ -44,4 +41,25 @@ public class AccountLogic implements IAccountLogic {
 
         return accountRepository.save(account);
     }
+
+    @Override
+    public void deleteAccount(int accountId) {
+        //check if account exists in the system
+        Account foundAccount = checkAccountExistsInDb(accountId);
+
+        accountRepository.delete(foundAccount);
+    }
+
+    //region Generic exception methods
+
+    private Account checkAccountExistsInDb(int accountId){
+        Optional<Account> accountFromDb = accountRepository.findById(accountId);
+        if(!accountFromDb.isPresent()){
+            throw new IllegalArgumentException("Account with id: " + accountId + " not found in the system");
+        }
+
+        return accountFromDb.get();
+    }
+
+    //endregion
 }

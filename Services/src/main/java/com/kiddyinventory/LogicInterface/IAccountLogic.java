@@ -16,4 +16,10 @@ public interface IAccountLogic {
      * @throws IllegalArgumentException if account already exists
      */
     Account createAccount(Account account);
+    /**
+     * @param accountId the account you want to create
+     * @return nothing if everything goes correct
+     * @throws IllegalArgumentException if account doesn't exist in the system
+     */
+    void deleteAccount(int accountId);
 }

@@ -21,25 +21,25 @@ public class ItemController {
         this.itemLogic = itemLogic;
     }
 
-    @PostMapping(path = "/add")
+    @PostMapping
     public ResponseEntity<Item> createItem(@RequestBody Item item) {
         Item createdItem = itemLogic.createItem(item);
         return new ResponseEntity<>(createdItem, HttpStatus.OK);
     }
 
-    @PutMapping(path = "/update")
+    @PutMapping
     public ResponseEntity<Item> updateItem(@RequestBody Item item) {
         Item updatedItem = itemLogic.updateItem(item);
         return new ResponseEntity<>(updatedItem, HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "/delete/{id}")
+    @DeleteMapping(path = "/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteItem(@PathVariable("id") int itemID) {
         itemLogic.deleteItem(itemID);
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<Item> getItem(@PathVariable("id") int itemID) {
         Item foundItem = itemLogic.getItem(itemID);
         return new ResponseEntity<>(foundItem, HttpStatus.OK);

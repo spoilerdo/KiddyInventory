@@ -1,11 +1,11 @@
 package com.kiddyinventory.Wrapper;
 
-public class itemRequestModel {
+public class ItemRequestWrapper {
 
     private int itemID;
     private int accountID;
 
-    public itemRequestModel(int itemID, int accountID) {
+    public ItemRequestWrapper(int itemID, int accountID) {
         this.itemID = itemID;
         this.accountID = accountID;
     }
