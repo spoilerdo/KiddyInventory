@@ -2,6 +2,8 @@ package com.kiddyinventory.Security;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.kiddyinventory.Entities.JwtUser;
+import com.kiddyinventory.Logic.AuthLogic;
 import com.kiddyinventory.Wrapper.LoginWrapper;
 import com.kiddyinventory.Wrapper.TokenWrapper;
 
@@ -30,15 +32,16 @@ import static com.kiddyinventory.Security.SecurityConstants.SecurityConstants.JW
 
 public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-    private UserDetailsService userDetailsImpl;
+    private AuthLogic userDetailsImpl; //TODO: removed the userDetailService implementation does this work??
 
-    public JwtAuthenticationProvider(UserDetailsService userDetailsImpl) {
+    public JwtAuthenticationProvider(AuthLogic userDetailsImpl) {
         this.userDetailsImpl = userDetailsImpl;
     }
 
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
-        userDetailsImpl.loadUserByUsername(userDetails.getUsername());
+        JwtUser user = (JwtUser) userDetails;
+        userDetailsImpl.loadUserByUsername(user.getUserID(), user.getUsername());
     }
 
     @Override
@@ -51,11 +54,12 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
                 .getBody();
 
         List<String> scopes = (List<String>) claims.get("scopes");
+        int UserId = (int) claims.get("userID");
         List<GrantedAuthority> authorities = scopes.stream()
                 .map(authority -> new SimpleGrantedAuthority(authority))
                 .collect(Collectors.toList());
 
-        return new User(username, authentication.getCredentials().toString(), authorities);
+        return new JwtUser(UserId, username, authentication.getCredentials().toString(), authorities);
     }
 
     private String retrieveAccountData(LoginWrapper loginWrapper){

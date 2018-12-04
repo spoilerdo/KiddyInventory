@@ -27,10 +27,10 @@ public class InventoryLogic implements IInventoryLogic {
     public Item saveItem(Principal user , int accountID, int itemID) throws IllegalArgumentException {
         Item foundItem = checkItemExistsInDb(itemID);
 
-        checkUserMatches(user.getName(), accountID);
+        checkAccountMatches(user.getName(), accountID);
 
         //check if user exists in de db
-        Account foundAccount = checkUserExistsInDb(accountID);
+        Account foundAccount = checkAccountExistsInDb(accountID);
 
         foundAccount.getItems().add(foundItem);
         foundItem.getAccounts().add(foundAccount);
@@ -48,10 +48,10 @@ public class InventoryLogic implements IInventoryLogic {
 
     @Override
     public List<Item> getItemsFromAccount(Principal user, int accountId) {
-        checkUserMatches(user.getName(), accountId);
+        checkAccountMatches(user.getName(), accountId);
 
         //check if the account exists in the database
-        Account accountFromDb = checkUserExistsInDb(accountId);
+        Account accountFromDb = checkAccountExistsInDb(accountId);
 
         //check if the account has any items
         checkAccountContainsItems(accountFromDb);
@@ -71,10 +71,10 @@ public class InventoryLogic implements IInventoryLogic {
     @Override
     public void deleteItemsFromAccount(Principal user, int accountId) {
         //check if he has access to make this call
-        checkUserMatches(user.getName(), accountId);
+        checkAccountMatches(user.getName(), accountId);
 
         //check if the account exists
-        Account accountFromDb = checkUserExistsInDb(accountId);
+        Account accountFromDb = checkAccountExistsInDb(accountId);
 
         //check if the account contains any items
         checkAccountContainsItems(accountFromDb);
@@ -88,13 +88,13 @@ public class InventoryLogic implements IInventoryLogic {
         //check if the item exists in the db
         Item itemFromDb = checkAccountHasItem(user.getName() ,itemID);
 
-        checkUserMatches(user.getName(), senderId);
+        checkAccountMatches(user.getName(), senderId);
 
         //check if sender account exists
-        Account senderAccountFromDb = checkUserExistsInDb(senderId);
+        Account senderAccountFromDb = checkAccountExistsInDb(senderId);
 
         //check if receiver account exists
-        Account receiverAccountFromDb = checkUserExistsInDb(receiverId);
+        Account receiverAccountFromDb = checkAccountExistsInDb(receiverId);
 
         //check if the sender has the given item in his inventory
         if(!senderAccountFromDb.getItems().contains(itemFromDb)){
@@ -111,7 +111,7 @@ public class InventoryLogic implements IInventoryLogic {
 
     //region Generic exception methods
 
-    private Account checkUserExistsInDb(int accountId){
+    private Account checkAccountExistsInDb(int accountId){
         Optional<Account> accountFromDb = _accountContext.findById(accountId);
         if(!accountFromDb.isPresent()){
             throw new IllegalArgumentException("Account with id: " + accountId + " not found in the system");
@@ -120,7 +120,7 @@ public class InventoryLogic implements IInventoryLogic {
         return accountFromDb.get();
     }
 
-    private void checkUserMatches(String username, int accountID) {
+    private void checkAccountMatches(String username, int accountID) {
         //get account ID from inventory db
         Optional<Account> foundAccount = _accountContext.findByUsername(username);
         if(!foundAccount.isPresent()){

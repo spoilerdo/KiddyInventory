@@ -28,12 +28,12 @@ public class InventoryController {
         return new ResponseEntity<>(this.inventoryLogic.saveItem(user, itemRequestWrapper.getAccountID(), itemRequestWrapper.getItemID()), HttpStatus.OK);
     }
 
-    @DeleteMapping(path = "{id}")
+    @DeleteMapping(path = "/{id}")
     public void deleteItemFromInventory(Principal user, @PathVariable("id") int itemID) {
         this.inventoryLogic.deleteItem(user, itemID);
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<List<Item>> GetAllItemsFromInventory(Principal user, @PathVariable("id") int accountID) {
         return new ResponseEntity<>(this.inventoryLogic.getItemsFromAccount(user, accountID), HttpStatus.OK);
     }

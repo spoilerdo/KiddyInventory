@@ -59,8 +59,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Date expirationDate = Date.valueOf(LocalDate.now().plusDays(1));
         Date currentDate = Date.valueOf(LocalDate.now());
 
-        //get username and make a claim with roles
+        //get username, id and make a claim with roles
         String subject = ((User)auth.getPrincipal()).getUsername();
+        //String id = ((User)auth.getPrincipal().)
         Claims claim = Jwts.claims().setSubject(subject);
         claim.put("scopes", auth.getAuthorities().stream().map(s -> s.toString()).collect(Collectors.toList()));
 

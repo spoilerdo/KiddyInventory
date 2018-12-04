@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.Optional;
 
 @Service
-public class AuthLogic implements UserDetailsService {
+public class AuthLogic {
     private IAccountRepository accountRepository;
 
     @Autowired
@@ -21,15 +21,15 @@ public class AuthLogic implements UserDetailsService {
         this.accountRepository = context;
     }
 
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Optional<Account> foundAccount = accountRepository.findByUsername(username);
+    //TODO: make this loadUserById (in order for this to work you need to send the id trough with the jwt token)
+    public UserDetails loadUserByUsername(int userId, String username) throws UsernameNotFoundException {
+        Optional<Account> foundAccount = accountRepository.findById(userId);
 
         //check if user has logged in to our inventory API before, if not create new account
         if (!foundAccount.isPresent()) {
-            Account newAccount = new Account(username);
+            Account newAccount = new Account(userId, username);
             accountRepository.save(newAccount);
         }
-        return new JwtUserPrincipal(new Account(username));
+        return new JwtUserPrincipal(new Account(userId, username));
     }
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 @Controller
-@RequestMapping("/account")
+@RequestMapping("/accounts")
 public class AccountController {
     private IAccountLogic accountLogic;
 
@@ -24,7 +24,7 @@ public class AccountController {
         return new ResponseEntity<>(createdAccount, HttpStatus.OK);
     }
 
-    @GetMapping(path = "{id}")
+    @GetMapping(path = "/{id}")
     public ResponseEntity<Account> getAccount(@PathVariable("id") int id) {
         return new ResponseEntity<>(accountLogic.getAccount(id), HttpStatus.OK);
     }
