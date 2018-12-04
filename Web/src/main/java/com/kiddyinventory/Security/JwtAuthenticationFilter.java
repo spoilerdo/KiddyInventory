@@ -1,6 +1,7 @@
 package com.kiddyinventory.Security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.kiddyinventory.Entities.JwtUser;
 import com.kiddyinventory.Wrapper.LoginWrapper;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -59,11 +60,13 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         Date expirationDate = Date.valueOf(LocalDate.now().plusDays(1));
         Date currentDate = Date.valueOf(LocalDate.now());
 
+        JwtUser user = (JwtUser)auth.getPrincipal();
         //get username, id and make a claim with roles
-        String subject = ((User)auth.getPrincipal()).getUsername();
+        String subject = user.getUsername();
         //String id = ((User)auth.getPrincipal().)
         Claims claim = Jwts.claims().setSubject(subject);
         claim.put("scopes", auth.getAuthorities().stream().map(s -> s.toString()).collect(Collectors.toList()));
+        claim.put("userID", user.getUserID());
 
         //build token
         String token =  Jwts.builder()
