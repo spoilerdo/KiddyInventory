@@ -24,8 +24,7 @@ public class AuthLogic {
         this.accountRepository = context;
     }
 
-    //TODO: make this loadUserById (in order for this to work you need to send the id trough with the jwt token)
-    public UserDetails loadUserByUsername(int userId, String username) throws UsernameNotFoundException {
+    public UserDetails loadUserById(int userId, String username) throws UsernameNotFoundException {
         Optional<Account> foundAccount = accountRepository.findById(userId);
 
         Account account;

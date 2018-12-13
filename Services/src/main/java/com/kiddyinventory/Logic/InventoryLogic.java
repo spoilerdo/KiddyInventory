@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import java.security.Principal;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 @Service
 public class InventoryLogic implements IInventoryLogic {
@@ -85,21 +86,16 @@ public class InventoryLogic implements IInventoryLogic {
 
     @Override
     public void moveItem(Principal user, int senderId, int receiverId, int itemID) {
-        //check if the item exists in the db
-        Item itemFromDb = checkAccountHasItem(user.getName() ,itemID);
-
-        checkAccountMatches(user.getName(), senderId);
-
         //check if sender account exists
         Account senderAccountFromDb = checkAccountExistsInDb(senderId);
 
         //check if receiver account exists
         Account receiverAccountFromDb = checkAccountExistsInDb(receiverId);
 
-        //check if the sender has the given item in his inventory
-        if(!senderAccountFromDb.getItems().contains(itemFromDb)){
-            throw new IllegalArgumentException("sender doesn't have the given item in his inventory");
-        }
+        //check if the item exists in the db
+        Item itemFromDb = checkAccountHasItem(senderAccountFromDb.getUsername(), itemID);
+
+        checkAccountMatches(user.getName(), receiverId);
 
         //move the item from sender to receiver
         senderAccountFromDb.getItems().remove(itemFromDb);

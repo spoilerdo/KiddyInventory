@@ -4,10 +4,11 @@ import com.kiddyinventory.Entities.Item;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 public interface IInventoryLogic {
     /**
-     * @param user the claim of the logged in user taken from JWT
+     * @param user the claim of the logged in user token from JWT
      * @param accountID the id of the account to save the item to
      * @param itemID the id of the item you want to save
      * @return the saved item

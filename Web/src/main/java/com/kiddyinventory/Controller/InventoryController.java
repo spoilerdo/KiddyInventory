@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
 
 @Controller
 @RequestMapping("/inventory")
@@ -29,6 +30,7 @@ public class InventoryController {
     }
 
     @DeleteMapping(path = "/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public void deleteItemFromInventory(Principal user, @PathVariable("id") int itemID) {
         this.inventoryLogic.deleteItem(user, itemID);
     }
@@ -39,11 +41,13 @@ public class InventoryController {
     }
 
     @DeleteMapping(path = "/all/{id}")
+    @ResponseStatus(HttpStatus.OK)
     public void DeleteAllItemsFromInventory(Principal user, @PathVariable("id") int accountID) {
         this.inventoryLogic.deleteItemsFromAccount(user, accountID);
     }
 
     @PostMapping(path = "/transfer")
+    @ResponseStatus(HttpStatus.OK)
     public void MoveItem(Principal user, @RequestBody TransactionWrapper response){
         this.inventoryLogic.moveItem(user, response.getSenderId(), response.getReceiverId(), response.getItemId());
     }

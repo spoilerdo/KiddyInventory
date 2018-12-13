@@ -16,9 +16,7 @@ import org.springframework.security.authentication.dao.AbstractUserDetailsAuthen
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -32,7 +30,7 @@ import static com.kiddyinventory.Security.SecurityConstants.SecurityConstants.JW
 
 public class JwtAuthenticationProvider extends AbstractUserDetailsAuthenticationProvider {
 
-    private AuthLogic userDetailsImpl; //TODO: removed the userDetailService implementation does this work??
+    private AuthLogic userDetailsImpl;
 
     public JwtAuthenticationProvider(AuthLogic userDetailsImpl) {
         this.userDetailsImpl = userDetailsImpl;
@@ -41,7 +39,7 @@ public class JwtAuthenticationProvider extends AbstractUserDetailsAuthentication
     @Override
     protected void additionalAuthenticationChecks(UserDetails userDetails, UsernamePasswordAuthenticationToken authentication) throws AuthenticationException {
         JwtUser user = (JwtUser) userDetails;
-        userDetailsImpl.loadUserByUsername(user.getUserID(), user.getUsername());
+        userDetailsImpl.loadUserById(user.getUserID(), user.getUsername());
     }
 
     @Override

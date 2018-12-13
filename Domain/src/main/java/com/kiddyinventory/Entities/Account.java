@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
@@ -13,7 +15,7 @@ public class Account {
     private int id;
     private String username;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    @ManyToMany(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name = "AccountItem",
             joinColumns = {@JoinColumn(name = "AccountID")},
