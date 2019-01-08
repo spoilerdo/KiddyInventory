@@ -14,7 +14,7 @@ import java.security.Principal;
 import java.util.List;
 import java.util.Set;
 
-@Controller
+@RestController
 @RequestMapping("/inventory")
 public class InventoryController {
     private IInventoryLogic inventoryLogic;

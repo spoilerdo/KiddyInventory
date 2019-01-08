@@ -3,6 +3,7 @@ package com.kiddyinventory.Entities;
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.kiddyinventory.Enums.Condition;
+import com.kiddyinventory.Enums.Quality;
 import org.springframework.hateoas.ResourceSupport;
 
 import javax.persistence.*;
@@ -19,6 +20,7 @@ public class Item extends ResourceSupport {
     private String name;
     private String description;
     private Condition condition;
+    private Quality quality;
     private Float price;
 
     @JsonBackReference
@@ -27,10 +29,11 @@ public class Item extends ResourceSupport {
 
     public Item() {}
 
-    public Item(String name, String description, Condition condition, Float price){
+    public Item(String name, String description, Condition condition, Quality quality, Float price){
         this.name = name;
         this.description = description;
         this.condition = condition;
+        this.quality = quality;
         this.price = price;
     }
 
@@ -52,6 +55,10 @@ public class Item extends ResourceSupport {
 
     public Condition getCondition() {
         return condition;
+    }
+
+    public Quality getQuality() {
+        return quality;
     }
 
     public Float getPrice() {
