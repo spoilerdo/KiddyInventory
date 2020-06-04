@@ -25,7 +25,7 @@ public class InventoryController {
     }
 
     @PostMapping(path = "")
-    public ResponseEntity<Item> addItemToInventory(Principal user, ItemRequestWrapper itemRequestWrapper) {
+    public ResponseEntity<Item> addItemToInventory(Principal user, @RequestBody ItemRequestWrapper itemRequestWrapper) {
         return new ResponseEntity<>(this.inventoryLogic.saveItem(user, itemRequestWrapper.getAccountID(), itemRequestWrapper.getItemID()), HttpStatus.OK);
     }
 

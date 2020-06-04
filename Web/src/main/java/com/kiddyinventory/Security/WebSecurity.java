@@ -34,7 +34,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .antMatchers(HttpMethod.POST, "/item").hasAnyAuthority("ADMIN")
                 .antMatchers(HttpMethod.PUT, "/item").hasAnyAuthority("ADMIN")
                 .antMatchers(HttpMethod.DELETE, "/item/{id}").hasAnyAuthority("ADMIN")
-                .antMatchers(HttpMethod.GET, "/item/{id}").permitAll()
+                .antMatchers(HttpMethod.GET, "/item/**").permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .addFilter(new JwtAuthenticationFilter(authenticationManager()))
