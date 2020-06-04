@@ -13,6 +13,9 @@ dependencies {
     //Swagger implementeren in spring boot voor API documentatie
     compile "io.springfox:springfox-swagger2:2.9.2"
     compile 'io.springfox:springfox-swagger-ui:2.9.2'
+    // https://mvnrepository.com/artifact/org.javassist/javassist
+    compile group: 'org.javassist', name: 'javassist', version: '3.23.1-GA'
+
 
     compile project(':Domain')
     compile project(':Data')

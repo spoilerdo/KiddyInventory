@@ -11,7 +11,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Item extends ResourceSupport {
 
     @Id

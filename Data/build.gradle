@@ -13,7 +13,8 @@ dependencies{
     compile("org.springframework.boot:spring-boot-starter-test")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile 'javax.xml.bind:jaxb-api:2.3.0'
-    runtime('com.microsoft.sqlserver:mssql-jdbc')
+    compile group: 'org.javassist', name: 'javassist', version: '3.23.1-GA'
+    runtime('mysql:mysql-connector-java')
 
     compile project(':Domain')
 }

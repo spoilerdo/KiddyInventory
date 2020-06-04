@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 @Entity
-@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Account {
     @Id
     private int id;
